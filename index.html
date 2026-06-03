@@ -205,12 +205,10 @@
     let rekodJualan = ambilData('jualan') || [];
     let modPilih = false;
 
-    // Rujukan elemen penting
     const pageSetup = document.getElementById('page-setup');
     const pageJualan = document.getElementById('page-jualan');
 
     window.onload = function() {
-        // Tetapkan tarikh
         const hariIni = new Date();
         document.getElementById('tarikh-jualan').valueAsDate = hariIni;
         const tigaHariLepas = new Date(hariIni);
@@ -222,7 +220,6 @@
         paparJadualProduk();
         isiDropdownProduk();
 
-        // Jika setup sudah lengkap, terus ke halaman jualan
         if (namaSyarikat && senaraiProduk.length > 0) {
             pageSetup.classList.remove('active');
             pageJualan.classList.add('active');
@@ -233,18 +230,24 @@
         paparSenaraiJualan();
     };
 
-    // ========== FUNGSI SETUP ==========
+    // ========== SETUP PRODUK ==========
     function tambahProduk() {
         const nama = document.getElementById('setup-nama-produk').value.trim();
         const harga = parseFloat(document.getElementById('setup-harga').value);
-        if (!nama || isNaN(harga) || harga <= 0) {
+
+        if (!nama || isNaN(harga)) {
             alert('Isi nama produk dan harga yang sah.');
             return;
         }
-        if (senaraiProduk.some(p => p.nama.toLowerCase() === nama.toLowerCase())) {
-            alert('Produk ini sudah ada.');
+        if (harga <= 0) {
+            alert('Harga produk mesti lebih daripada RM 0.00.');
             return;
         }
+        if (senaraiProduk.some(p => p.nama.toLowerCase() === nama.toLowerCase())) {
+            alert('Produk ini sudah ada dalam senarai.');
+            return;
+        }
+
         senaraiProduk.push({ nama, harga });
         simpanData('produk', senaraiProduk);
         paparJadualProduk();
@@ -268,19 +271,13 @@
         }
 
         thPilih.style.display = modPilih ? '' : 'none';
-        if (modPilih) {
-            barPilih.classList.add('active');
-            btnPilih.style.display = 'none';
-        } else {
-            barPilih.classList.remove('active');
-            btnPilih.style.display = 'inline-block';
-        }
+        barPilih.classList.toggle('active', modPilih);
+        btnPilih.style.display = modPilih ? 'none' : 'inline-block';
 
         tbody.innerHTML = '';
         senaraiProduk.forEach((produk, index) => {
             const tr = document.createElement('tr');
 
-            // Checkbox
             const tdPilih = document.createElement('td');
             tdPilih.style.display = modPilih ? '' : 'none';
             const chk = document.createElement('input');
@@ -291,17 +288,14 @@
             tdPilih.appendChild(chk);
             tr.appendChild(tdPilih);
 
-            // Nama produk
             const tdNama = document.createElement('td');
             tdNama.textContent = produk.nama;
             tr.appendChild(tdNama);
 
-            // Harga
             const tdHarga = document.createElement('td');
             tdHarga.textContent = produk.harga.toFixed(2);
             tr.appendChild(tdHarga);
 
-            // Tindakan
             const tdTindakan = document.createElement('td');
             if (!modPilih) {
                 const btnPadam = document.createElement('button');
@@ -318,15 +312,8 @@
         kemaskiniBilanganDipilih();
     }
 
-    function aktifkanModPilih() {
-        modPilih = true;
-        paparJadualProduk();
-    }
-
-    function tamatModPilih() {
-        modPilih = false;
-        paparJadualProduk();
-    }
+    function aktifkanModPilih() { modPilih = true; paparJadualProduk(); }
+    function tamatModPilih() { modPilih = false; paparJadualProduk(); }
 
     function kemaskiniBilanganDipilih() {
         const semuaCheckbox = document.querySelectorAll('#isi-jadual-produk input[type="checkbox"]');
@@ -337,9 +324,7 @@
     function padamProdukDipilih() {
         const semuaCheckbox = document.querySelectorAll('#isi-jadual-produk input[type="checkbox"]');
         const indeksUntukPadam = [];
-        semuaCheckbox.forEach((chk, idx) => {
-            if (chk.checked) indeksUntukPadam.push(idx);
-        });
+        semuaCheckbox.forEach((chk, idx) => { if (chk.checked) indeksUntukPadam.push(idx); });
         if (indeksUntukPadam.length === 0) {
             alert('Tiada produk dipilih.');
             return;
@@ -386,7 +371,7 @@
         document.getElementById('setup-nama-syarikat').value = namaSyarikat;
     }
 
-    // ========== FUNGSI JUALAN ==========
+    // ========== REKOD JUALAN ==========
     function isiDropdownProduk() {
         const select = document.getElementById('pilih-produk');
         select.innerHTML = '<option value="">-- Pilih Produk --</option>';
@@ -415,15 +400,22 @@
         }
         const produk = senaraiProduk[parseInt(indeksProduk)];
 
+        // Semak rekod sedia ada
         const sudahAda = rekodJualan.some(item => item.tarikh === tarikh && item.produk === produk.nama);
         if (sudahAda) {
             alert(`Produk "${produk.nama}" sudah direkodkan pada tarikh ${formatTarikh(tarikh)}. Sila pilih tarikh lain atau padam rekod terdahulu.`);
             return;
         }
 
-        const dihantar = parseInt(document.getElementById('bil-dihantar').value) || 0;
-        const tambahan = parseInt(document.getElementById('bil-tambahan').value) || 0;
-        const terjual = parseInt(document.getElementById('bil-terjual').value) || 0;
+        // Ambil nilai dan pastikan tidak negatif
+        const dihantar = parseInt(document.getElementById('bil-dihantar').value);
+        const tambahan = parseInt(document.getElementById('bil-tambahan').value);
+        const terjual = parseInt(document.getElementById('bil-terjual').value);
+
+        if (isNaN(dihantar) || dihantar < 0 || isNaN(tambahan) || tambahan < 0 || isNaN(terjual) || terjual < 0) {
+            alert('Bilangan dihantar, tambahan, dan terjual tidak boleh negatif. Sila betulkan.');
+            return;
+        }
 
         if ((dihantar + tambahan) < terjual) {
             alert('Ralat: Jumlah Dihantar + Tambahan (' + (dihantar + tambahan) + ') kurang daripada Bilangan Terjual (' + terjual + '). Sila betulkan.');
@@ -434,6 +426,7 @@
         rekodJualan.push({ tarikh, produk: produk.nama, dihantar, tambahan, terjual, harga: produk.harga, jumlah });
         simpanData('jualan', rekodJualan);
         paparSenaraiJualan();
+
         // Reset input
         document.getElementById('bil-dihantar').value = '0';
         document.getElementById('bil-tambahan').value = '0';
@@ -495,38 +488,3 @@
 
         const tbody = document.getElementById('cetak-isi');
         tbody.innerHTML = '';
-        let jumlahBesar = 0;
-        rekodTapis.forEach((item, i) => {
-            tbody.innerHTML += `<tr>
-                <td>${i+1}</td>
-                <td>${formatTarikh(item.tarikh)}</td>
-                <td>${item.produk}</td>
-                <td>${item.dihantar}</td>
-                <td>${item.tambahan}</td>
-                <td>${item.terjual}</td>
-                <td>${item.harga.toFixed(2)}</td>
-                <td>${item.jumlah.toFixed(2)}</td>
-            </tr>`;
-            jumlahBesar += item.jumlah;
-        });
-
-        // Ringkasan harian
-        const jumlahPerHari = {};
-        rekodTapis.forEach(item => {
-            if (!jumlahPerHari[item.tarikh]) jumlahPerHari[item.tarikh] = 0;
-            jumlahPerHari[item.tarikh] += item.jumlah;
-        });
-        const tarikhUnik = Object.keys(jumlahPerHari).sort();
-        let htmlRingkasan = '<strong>Ringkasan Jualan Mengikut Hari:</strong><br>';
-        tarikhUnik.forEach(t => {
-            htmlRingkasan += `${formatTarikh(t)}: RM ${jumlahPerHari[t].toFixed(2)}<br>`;
-        });
-        htmlRingkasan += `<strong>Jumlah Keseluruhan: RM ${jumlahBesar.toFixed(2)}</strong>`;
-        document.getElementById('ringkasan-harian').innerHTML = htmlRingkasan;
-
-        document.getElementById('cetak-jumlah-besar').innerText = jumlahBesar.toFixed(2);
-        window.print();
-    }
-</script>
-</body>
-</html>
