@@ -16,6 +16,7 @@
         .btn-success { background: #27ae60; color: white; }
         .btn-warning { background: #f39c12; color: white; }
         .btn-danger { background: #e74c3c; color: white; }
+        .btn-secondary { background: #95a5a6; color: white; }
         .form-group { margin-bottom: 15px; }
         label { display: inline-block; width: 150px; font-weight: bold; }
         input, select { padding: 8px; width: 250px; border: 1px solid #ccc; border-radius: 4px; }
@@ -29,6 +30,26 @@
         .filter-section label { width: auto; margin-right: 5px; }
         .filter-section input[type="date"] { width: 150px; }
 
+        .select-mode-bar {
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            background: #eaf2f8;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .select-mode-bar.active { display: flex; }
+        .select-mode-bar span { font-weight: bold; }
+        .chk-produk { display: none; }
+        .chk-produk.show { display: inline-block; margin-right: 8px; }
+
+        .ringkasan-harian {
+            margin-top: 20px;
+            border: 1px solid #000;
+            padding: 10px;
+            text-align: left;
+        }
         @media print {
             body { background: white; margin: 0; }
             .container { box-shadow: none; padding: 0; }
@@ -41,6 +62,7 @@
             .header-kanan { float: right; font-size: 14px; }
             .clearfix::after { content: ""; clear: both; display: table; }
             .jarak-empat { margin-top: 4em; }
+            .ringkasan-harian { border: none; }
         }
         #resit-print { display: none; }
     </style>
@@ -66,10 +88,30 @@
         </div>
         <button class="btn btn-success" onclick="tambahProduk()">+ Tambah Produk</button>
 
+        <!-- Bar mod pemilihan -->
+        <div id="select-mode-bar" class="select-mode-bar">
+            <span id="bilangan-dipilih">0 dipilih</span>
+            <div>
+                <button class="btn btn-danger" onclick="padamProdukDipilih()">Padam Pilihan</button>
+                <button class="btn btn-secondary" onclick="tamatModPilih()">Batal</button>
+            </div>
+        </div>
+
         <table id="jadual-produk">
-            <thead><tr><th>Nama Produk</th><th>Harga (RM)</th><th>Tindakan</th></tr></thead>
-            <tbody id="isi-jadual-produk"><tr><td colspan="3">Tiada produk. Sila tambah.</td></tr></tbody>
+            <thead>
+                <tr>
+                    <th id="th-pilih" style="display:none;">Pilih</th>
+                    <th>Nama Produk</th>
+                    <th>Harga (RM)</th>
+                    <th>Tindakan</th>
+                </tr>
+            </thead>
+            <tbody id="isi-jadual-produk">
+                <tr><td colspan="4">Tiada produk. Sila tambah.</td></tr>
+            </tbody>
         </table>
+
+        <button id="btn-pilih-produk" class="btn btn-warning" onclick="aktifkanModPilih()">🗂️ Pilih Produk</button>
 
         <div class="btn-group">
             <button class="btn btn-primary" onclick="simpanSetup()">💾 Simpan & Pergi ke Rekod Jualan</button>
@@ -134,25 +176,53 @@
     <table>
         <thead><tr><th>No</th><th>Tarikh</th><th>Nama Produk</th><th>Bil. Dihantar</th><th>Bil. Tambahan</th><th>Bil. Terjual</th><th>Harga (RM)</th><th>Jumlah (RM)</th></tr></thead>
         <tbody id="cetak-isi"></tbody>
-        <tfoot><tr class="total-row"><td colspan="7" style="text-align:right;">Jumlah Keseluruhan:</td><td id="cetak-jumlah-besar"></td></tr></tfoot>
+    </table>
+    <div class="ringkasan-harian" id="ringkasan-harian"></div>
+    <table style="margin-top:0;">
+        <tfoot>
+            <tr class="total-row">
+                <td colspan="7" style="text-align:right;">Jumlah Keseluruhan:</td>
+                <td id="cetak-jumlah-besar"></td>
+            </tr>
+        </tfoot>
     </table>
 </div>
 
 <script>
+    // Fungsi format tarikh
+    function formatTarikh(tarikhStr) {
+        if (!tarikhStr) return '';
+        const [tahun, bulan, hari] = tarikhStr.split('-');
+        return `${hari}/${bulan}/${tahun}`;
+    }
+
+    // Data dan localStorage
     function simpanData(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
     function ambilData(key) { const data = localStorage.getItem(key); return data ? JSON.parse(data) : null; }
 
     let senaraiProduk = ambilData('produk') || [];
     let namaSyarikat = ambilData('syarikat') || '';
     let rekodJualan = ambilData('jualan') || [];
+    let modPilih = false;
 
+    // Rujukan elemen penting
     const pageSetup = document.getElementById('page-setup');
     const pageJualan = document.getElementById('page-jualan');
 
     window.onload = function() {
+        // Tetapkan tarikh
+        const hariIni = new Date();
+        document.getElementById('tarikh-jualan').valueAsDate = hariIni;
+        const tigaHariLepas = new Date(hariIni);
+        tigaHariLepas.setDate(hariIni.getDate() - 2);
+        document.getElementById('dari-tarikh').valueAsDate = tigaHariLepas;
+        document.getElementById('hingga-tarikh').valueAsDate = hariIni;
+
         if (namaSyarikat) document.getElementById('setup-nama-syarikat').value = namaSyarikat;
         paparJadualProduk();
         isiDropdownProduk();
+
+        // Jika setup sudah lengkap, terus ke halaman jualan
         if (namaSyarikat && senaraiProduk.length > 0) {
             pageSetup.classList.remove('active');
             pageJualan.classList.add('active');
@@ -160,20 +230,21 @@
             pageSetup.classList.add('active');
             pageJualan.classList.remove('active');
         }
-        const hariIni = new Date();
-        document.getElementById('tarikh-jualan').valueAsDate = hariIni;
-        const tigaHariLepas = new Date(hariIni);
-        tigaHariLepas.setDate(hariIni.getDate() - 2);
-        document.getElementById('dari-tarikh').valueAsDate = tigaHariLepas;
-        document.getElementById('hingga-tarikh').valueAsDate = hariIni;
         paparSenaraiJualan();
     };
 
+    // ========== FUNGSI SETUP ==========
     function tambahProduk() {
         const nama = document.getElementById('setup-nama-produk').value.trim();
         const harga = parseFloat(document.getElementById('setup-harga').value);
-        if (!nama || isNaN(harga) || harga <= 0) { alert('Isi nama produk dan harga yang sah.'); return; }
-        if (senaraiProduk.some(p => p.nama.toLowerCase() === nama.toLowerCase())) { alert('Produk ini sudah ada.'); return; }
+        if (!nama || isNaN(harga) || harga <= 0) {
+            alert('Isi nama produk dan harga yang sah.');
+            return;
+        }
+        if (senaraiProduk.some(p => p.nama.toLowerCase() === nama.toLowerCase())) {
+            alert('Produk ini sudah ada.');
+            return;
+        }
         senaraiProduk.push({ nama, harga });
         simpanData('produk', senaraiProduk);
         paparJadualProduk();
@@ -183,21 +254,125 @@
 
     function paparJadualProduk() {
         const tbody = document.getElementById('isi-jadual-produk');
-        if (senaraiProduk.length === 0) { tbody.innerHTML = '<tr><td colspan="3">Tiada produk. Sila tambah.</td></tr>'; return; }
+        const thPilih = document.getElementById('th-pilih');
+        const barPilih = document.getElementById('select-mode-bar');
+        const btnPilih = document.getElementById('btn-pilih-produk');
+
+        if (senaraiProduk.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4">Tiada produk. Sila tambah.</td></tr>';
+            thPilih.style.display = 'none';
+            barPilih.classList.remove('active');
+            btnPilih.style.display = 'none';
+            modPilih = false;
+            return;
+        }
+
+        thPilih.style.display = modPilih ? '' : 'none';
+        if (modPilih) {
+            barPilih.classList.add('active');
+            btnPilih.style.display = 'none';
+        } else {
+            barPilih.classList.remove('active');
+            btnPilih.style.display = 'inline-block';
+        }
+
         tbody.innerHTML = '';
         senaraiProduk.forEach((produk, index) => {
-            tbody.innerHTML += `<tr><td>${produk.nama}</td><td>${produk.harga.toFixed(2)}</td><td><button class="btn btn-danger" onclick="padamProduk(${index})">Padam</button></td></tr>`;
+            const tr = document.createElement('tr');
+
+            // Checkbox
+            const tdPilih = document.createElement('td');
+            tdPilih.style.display = modPilih ? '' : 'none';
+            const chk = document.createElement('input');
+            chk.type = 'checkbox';
+            chk.className = 'chk-produk show';
+            chk.dataset.index = index;
+            chk.addEventListener('change', kemaskiniBilanganDipilih);
+            tdPilih.appendChild(chk);
+            tr.appendChild(tdPilih);
+
+            // Nama produk
+            const tdNama = document.createElement('td');
+            tdNama.textContent = produk.nama;
+            tr.appendChild(tdNama);
+
+            // Harga
+            const tdHarga = document.createElement('td');
+            tdHarga.textContent = produk.harga.toFixed(2);
+            tr.appendChild(tdHarga);
+
+            // Tindakan
+            const tdTindakan = document.createElement('td');
+            if (!modPilih) {
+                const btnPadam = document.createElement('button');
+                btnPadam.className = 'btn btn-danger';
+                btnPadam.textContent = 'Padam';
+                btnPadam.onclick = () => padamProduk(index);
+                tdTindakan.appendChild(btnPadam);
+            }
+            tr.appendChild(tdTindakan);
+
+            tbody.appendChild(tr);
         });
+
+        kemaskiniBilanganDipilih();
+    }
+
+    function aktifkanModPilih() {
+        modPilih = true;
+        paparJadualProduk();
+    }
+
+    function tamatModPilih() {
+        modPilih = false;
+        paparJadualProduk();
+    }
+
+    function kemaskiniBilanganDipilih() {
+        const semuaCheckbox = document.querySelectorAll('#isi-jadual-produk input[type="checkbox"]');
+        const dipilih = Array.from(semuaCheckbox).filter(chk => chk.checked).length;
+        document.getElementById('bilangan-dipilih').textContent = dipilih + ' dipilih';
+    }
+
+    function padamProdukDipilih() {
+        const semuaCheckbox = document.querySelectorAll('#isi-jadual-produk input[type="checkbox"]');
+        const indeksUntukPadam = [];
+        semuaCheckbox.forEach((chk, idx) => {
+            if (chk.checked) indeksUntukPadam.push(idx);
+        });
+        if (indeksUntukPadam.length === 0) {
+            alert('Tiada produk dipilih.');
+            return;
+        }
+        if (!confirm('Padam ' + indeksUntukPadam.length + ' produk yang dipilih?')) return;
+
+        indeksUntukPadam.sort((a,b) => b - a);
+        indeksUntukPadam.forEach(i => senaraiProduk.splice(i, 1));
+        simpanData('produk', senaraiProduk);
+        modPilih = false;
+        paparJadualProduk();
+        isiDropdownProduk();
     }
 
     function padamProduk(index) {
-        if (confirm('Padam produk ini?')) { senaraiProduk.splice(index, 1); simpanData('produk', senaraiProduk); paparJadualProduk(); isiDropdownProduk(); }
+        if (confirm('Padam produk ini?')) {
+            senaraiProduk.splice(index, 1);
+            simpanData('produk', senaraiProduk);
+            paparJadualProduk();
+            isiDropdownProduk();
+        }
     }
 
     function simpanSetup() {
         const syarikat = document.getElementById('setup-nama-syarikat').value.trim();
-        if (!syarikat) { alert('Sila isi nama syarikat.'); return; }
-        if (senaraiProduk.length === 0) { alert('Tambahkan sekurang-kurangnya satu produk.'); return; }
+        if (!syarikat) {
+            alert('Sila isi nama syarikat.');
+            return;
+        }
+        if (senaraiProduk.length === 0) {
+            alert('Tambahkan sekurang-kurangnya satu produk.');
+            return;
+        }
         namaSyarikat = syarikat;
         simpanData('syarikat', namaSyarikat);
         isiDropdownProduk();
@@ -211,42 +386,55 @@
         document.getElementById('setup-nama-syarikat').value = namaSyarikat;
     }
 
+    // ========== FUNGSI JUALAN ==========
     function isiDropdownProduk() {
         const select = document.getElementById('pilih-produk');
         select.innerHTML = '<option value="">-- Pilih Produk --</option>';
-        senaraiProduk.forEach((produk, index) => { select.innerHTML += `<option value="${index}">${produk.nama}</option>`; });
+        senaraiProduk.forEach((produk, index) => {
+            select.innerHTML += `<option value="${index}">${produk.nama}</option>`;
+        });
         document.getElementById('harga-produk-auto').value = '0.00';
     }
 
     document.getElementById('pilih-produk').addEventListener('change', function() {
         const index = this.value;
-        if (index === '') { document.getElementById('harga-produk-auto').value = '0.00'; return; }
+        if (index === '') {
+            document.getElementById('harga-produk-auto').value = '0.00';
+            return;
+        }
         const produk = senaraiProduk[parseInt(index)];
         document.getElementById('harga-produk-auto').value = produk.harga.toFixed(2);
     });
 
-    // *** Fungsi tambahItem dengan pengesahan produk+tarikh unik ***
     function tambahItem() {
         const tarikh = document.getElementById('tarikh-jualan').value;
         const indeksProduk = document.getElementById('pilih-produk').value;
-        if (!tarikh || indeksProduk === '') { alert('Pilih tarikh dan produk.'); return; }
+        if (!tarikh || indeksProduk === '') {
+            alert('Pilih tarikh dan produk.');
+            return;
+        }
         const produk = senaraiProduk[parseInt(indeksProduk)];
 
-        // Semak kewujudan rekod dengan produk dan tarikh yang sama
         const sudahAda = rekodJualan.some(item => item.tarikh === tarikh && item.produk === produk.nama);
         if (sudahAda) {
-            alert(`Produk "${produk.nama}" sudah direkodkan pada tarikh ${tarikh}. Sila pilih tarikh lain atau padam rekod terdahulu.`);
+            alert(`Produk "${produk.nama}" sudah direkodkan pada tarikh ${formatTarikh(tarikh)}. Sila pilih tarikh lain atau padam rekod terdahulu.`);
             return;
         }
 
         const dihantar = parseInt(document.getElementById('bil-dihantar').value) || 0;
         const tambahan = parseInt(document.getElementById('bil-tambahan').value) || 0;
         const terjual = parseInt(document.getElementById('bil-terjual').value) || 0;
-        const jumlah = terjual * produk.harga;
 
+        if ((dihantar + tambahan) < terjual) {
+            alert('Ralat: Jumlah Dihantar + Tambahan (' + (dihantar + tambahan) + ') kurang daripada Bilangan Terjual (' + terjual + '). Sila betulkan.');
+            return;
+        }
+
+        const jumlah = terjual * produk.harga;
         rekodJualan.push({ tarikh, produk: produk.nama, dihantar, tambahan, terjual, harga: produk.harga, jumlah });
         simpanData('jualan', rekodJualan);
         paparSenaraiJualan();
+        // Reset input
         document.getElementById('bil-dihantar').value = '0';
         document.getElementById('bil-tambahan').value = '0';
         document.getElementById('bil-terjual').value = '0';
@@ -254,28 +442,52 @@
 
     function paparSenaraiJualan() {
         const tbody = document.getElementById('isi-senarai-jualan');
-        if (rekodJualan.length === 0) { tbody.innerHTML = '<tr><td colspan="9">Tiada rekod jualan.</td></tr>'; return; }
+        if (rekodJualan.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9">Tiada rekod jualan.</td></tr>';
+            return;
+        }
         tbody.innerHTML = '';
         rekodJualan.forEach((item, index) => {
-            tbody.innerHTML += `<tr><td>${index+1}</td><td>${item.tarikh}</td><td>${item.produk}</td><td>${item.dihantar}</td><td>${item.tambahan}</td><td>${item.terjual}</td><td>${item.harga.toFixed(2)}</td><td>${item.jumlah.toFixed(2)}</td><td><button class="btn btn-danger" onclick="padamRekod(${index})">X</button></td></tr>`;
+            tbody.innerHTML += `<tr>
+                <td>${index+1}</td>
+                <td>${formatTarikh(item.tarikh)}</td>
+                <td>${item.produk}</td>
+                <td>${item.dihantar}</td>
+                <td>${item.tambahan}</td>
+                <td>${item.terjual}</td>
+                <td>${item.harga.toFixed(2)}</td>
+                <td>${item.jumlah.toFixed(2)}</td>
+                <td><button class="btn btn-danger" onclick="padamRekod(${index})">X</button></td>
+            </tr>`;
         });
     }
 
     function padamRekod(index) {
-        if (confirm('Padam rekod ini?')) { rekodJualan.splice(index, 1); simpanData('jualan', rekodJualan); paparSenaraiJualan(); }
+        if (confirm('Padam rekod ini?')) {
+            rekodJualan.splice(index, 1);
+            simpanData('jualan', rekodJualan);
+            paparSenaraiJualan();
+        }
     }
 
+    // ========== CETAKAN ==========
     function cetakResit() {
         const dari = document.getElementById('dari-tarikh').value;
         const hingga = document.getElementById('hingga-tarikh').value;
-        if (!dari || !hingga) { alert('Pilih tarikh mula dan tamat.'); return; }
+        if (!dari || !hingga) {
+            alert('Pilih tarikh mula dan tamat.');
+            return;
+        }
         const mula = new Date(dari + 'T00:00:00');
         const tamat = new Date(hingga + 'T23:59:59');
         const rekodTapis = rekodJualan.filter(item => {
             const t = new Date(item.tarikh + 'T00:00:00');
             return t >= mula && t <= tamat;
         });
-        if (rekodTapis.length === 0) { alert('Tiada rekod dalam tempoh ini.'); return; }
+        if (rekodTapis.length === 0) {
+            alert('Tiada rekod dalam tempoh ini.');
+            return;
+        }
 
         document.getElementById('cetak-nama-syarikat').innerText = namaSyarikat;
         const sekarang = new Date();
@@ -285,9 +497,33 @@
         tbody.innerHTML = '';
         let jumlahBesar = 0;
         rekodTapis.forEach((item, i) => {
-            tbody.innerHTML += `<tr><td>${i+1}</td><td>${item.tarikh}</td><td>${item.produk}</td><td>${item.dihantar}</td><td>${item.tambahan}</td><td>${item.terjual}</td><td>${item.harga.toFixed(2)}</td><td>${item.jumlah.toFixed(2)}</td></tr>`;
+            tbody.innerHTML += `<tr>
+                <td>${i+1}</td>
+                <td>${formatTarikh(item.tarikh)}</td>
+                <td>${item.produk}</td>
+                <td>${item.dihantar}</td>
+                <td>${item.tambahan}</td>
+                <td>${item.terjual}</td>
+                <td>${item.harga.toFixed(2)}</td>
+                <td>${item.jumlah.toFixed(2)}</td>
+            </tr>`;
             jumlahBesar += item.jumlah;
         });
+
+        // Ringkasan harian
+        const jumlahPerHari = {};
+        rekodTapis.forEach(item => {
+            if (!jumlahPerHari[item.tarikh]) jumlahPerHari[item.tarikh] = 0;
+            jumlahPerHari[item.tarikh] += item.jumlah;
+        });
+        const tarikhUnik = Object.keys(jumlahPerHari).sort();
+        let htmlRingkasan = '<strong>Ringkasan Jualan Mengikut Hari:</strong><br>';
+        tarikhUnik.forEach(t => {
+            htmlRingkasan += `${formatTarikh(t)}: RM ${jumlahPerHari[t].toFixed(2)}<br>`;
+        });
+        htmlRingkasan += `<strong>Jumlah Keseluruhan: RM ${jumlahBesar.toFixed(2)}</strong>`;
+        document.getElementById('ringkasan-harian').innerHTML = htmlRingkasan;
+
         document.getElementById('cetak-jumlah-besar').innerText = jumlahBesar.toFixed(2);
         window.print();
     }
