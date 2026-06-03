@@ -2,33 +2,98 @@
 <html lang="ms">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Aplikasi Jualan - Setup & Rekod</title>
     <style>
         * { box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; margin: 20px; background: #f0f2f5; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: #2c3e50; margin-top: 0; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 10px;
+            background: #f0f2f5;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow-x: hidden;
+        }
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-top: 0;
+        }
         .page { display: none; }
         .page.active { display: block; }
-        .btn { padding: 8px 18px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+        .btn {
+            padding: 10px 15px;
+            margin: 5px 2px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
         .btn-primary { background: #3498db; color: white; }
         .btn-success { background: #27ae60; color: white; }
         .btn-warning { background: #f39c12; color: white; }
         .btn-danger { background: #e74c3c; color: white; }
         .btn-secondary { background: #95a5a6; color: white; }
-        .form-group { margin-bottom: 15px; }
-        label { display: inline-block; width: 150px; font-weight: bold; }
-        input, select { padding: 8px; width: 250px; border: 1px solid #ccc; border-radius: 4px; }
-        input[type="number"] { width: 120px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+
+        .form-group {
+            margin-bottom: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        label {
+            width: 150px;
+            font-weight: bold;
+        }
+        input, select {
+            padding: 8px;
+            width: 250px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        input[type="number"] {
+            width: 120px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            table-layout: auto;
+            word-wrap: break-word;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px 4px;
+            text-align: center;
+            font-size: 14px;
+        }
         th { background: #f8f9fa; }
+        td { word-break: break-word; }
         .total-row { font-weight: bold; background: #e9ecef; }
+
         .btn-group { margin: 15px 0; }
-        .filter-section { background: #e9ecef; padding: 10px; border-radius: 5px; margin: 15px 0; }
-        .filter-section label { width: auto; margin-right: 5px; }
-        .filter-section input[type="date"] { width: 150px; }
+        .filter-section {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .filter-section label {
+            width: auto;
+            margin-right: 5px;
+        }
+        .filter-section input[type="date"] {
+            width: 130px;
+        }
 
         .select-mode-bar {
             display: none;
@@ -50,13 +115,65 @@
             padding: 10px;
             text-align: left;
         }
+
+        /* Jadual responsif */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-top: 15px;
+        }
+
+        /* CSS untuk skrin kecil (telefon) */
+        @media screen and (max-width: 600px) {
+            body { margin: 5px; }
+            .container { padding: 15px; }
+            h2 { font-size: 20px; }
+            .form-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            label {
+                width: 100%;
+                margin-bottom: 3px;
+            }
+            input, select {
+                width: 100% !important;
+            }
+            input[type="number"] {
+                width: 100% !important;
+            }
+            .btn {
+                font-size: 13px;
+                padding: 8px 12px;
+            }
+            th, td {
+                font-size: 12px;
+                padding: 6px 2px;
+            }
+            .filter-section input[type="date"] {
+                width: 100%;
+            }
+            .btn-group {
+                display: flex;
+                flex-wrap: wrap;
+            }
+            .btn-group .btn {
+                flex: 1 0 auto;
+            }
+        }
+
         @media print {
             body { background: white; margin: 0; }
             .container { box-shadow: none; padding: 0; }
             .page.active { display: none; }
             #resit-print { display: block !important; }
             #resit-print table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-            #resit-print th, #resit-print td { border: 1px solid #000; padding: 5px; font-size: 12px; text-align: center; }
+            #resit-print th, #resit-print td {
+                border: 1px solid #000;
+                padding: 5px;
+                font-size: 12px;
+                text-align: center;
+            }
             #resit-print th { background: #ddd; }
             .header-kiri { float: left; font-weight: bold; font-size: 18px; }
             .header-kanan { float: right; font-size: 14px; }
@@ -157,10 +274,24 @@
         </div>
 
         <h3>📌 Rekod Tersimpan</h3>
-        <table id="senarai-jualan">
-            <thead><tr><th>No</th><th>Tarikh</th><th>Produk</th><th>Dihantar</th><th>Tambahan</th><th>Terjual</th><th>Harga (RM)</th><th>Jumlah (RM)</th><th>Padam</th></tr></thead>
-            <tbody id="isi-senarai-jualan"></tbody>
-        </table>
+        <div class="table-responsive">
+            <table id="senarai-jualan">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Tarikh</th>
+                        <th>Produk</th>
+                        <th>Dihantar</th>
+                        <th>Tambahan</th>
+                        <th>Terjual</th>
+                        <th>Harga (RM)</th>
+                        <th>Jumlah (RM)</th>
+                        <th>Padam</th>
+                    </tr>
+                </thead>
+                <tbody id="isi-senarai-jualan"></tbody>
+            </table>
+        </div>
 
         <button class="btn btn-warning" onclick="kembaliKeSetup()">🔙 Kembali ke Setup</button>
     </div>
@@ -400,14 +531,12 @@
         }
         const produk = senaraiProduk[parseInt(indeksProduk)];
 
-        // Semak rekod sedia ada
         const sudahAda = rekodJualan.some(item => item.tarikh === tarikh && item.produk === produk.nama);
         if (sudahAda) {
             alert(`Produk "${produk.nama}" sudah direkodkan pada tarikh ${formatTarikh(tarikh)}. Sila pilih tarikh lain atau padam rekod terdahulu.`);
             return;
         }
 
-        // Ambil nilai dan pastikan tidak negatif
         const dihantar = parseInt(document.getElementById('bil-dihantar').value);
         const tambahan = parseInt(document.getElementById('bil-tambahan').value);
         const terjual = parseInt(document.getElementById('bil-terjual').value);
@@ -427,7 +556,6 @@
         simpanData('jualan', rekodJualan);
         paparSenaraiJualan();
 
-        // Reset input
         document.getElementById('bil-dihantar').value = '0';
         document.getElementById('bil-tambahan').value = '0';
         document.getElementById('bil-terjual').value = '0';
