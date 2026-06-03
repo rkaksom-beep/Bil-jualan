@@ -20,11 +20,7 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             overflow-x: hidden;
         }
-        h2 {
-            text-align: center;
-            color: #2c3e50;
-            margin-top: 0;
-        }
+        h2 { text-align: center; color: #2c3e50; margin-top: 0; }
         .page { display: none; }
         .page.active { display: block; }
 
@@ -42,6 +38,8 @@
         .btn-warning { background: #f39c12; color: white; }
         .btn-danger { background: #e74c3c; color: white; }
         .btn-secondary { background: #95a5a6; color: white; }
+        .btn-info { background: #17a2b8; color: white; }
+        .btn-backup { background: #6f42c1; color: white; }
 
         .form-group {
             margin-bottom: 12px;
@@ -49,19 +47,14 @@
             flex-wrap: wrap;
             align-items: center;
         }
-        label {
-            width: 150px;
-            font-weight: bold;
-        }
+        label { width: 150px; font-weight: bold; }
         input, select {
             padding: 8px;
             width: 250px;
             border: 1px solid #ccc;
             border-radius: 4px;
         }
-        input[type="number"] {
-            width: 120px;
-        }
+        input[type="number"] { width: 120px; }
 
         table {
             width: 100%;
@@ -87,13 +80,8 @@
             border-radius: 5px;
             margin: 15px 0;
         }
-        .filter-section label {
-            width: auto;
-            margin-right: 5px;
-        }
-        .filter-section input[type="date"] {
-            width: 130px;
-        }
+        .filter-section label { width: auto; margin-right: 5px; }
+        .filter-section input[type="date"] { width: 130px; }
 
         .select-mode-bar {
             display: none;
@@ -116,50 +104,33 @@
             text-align: left;
         }
 
-        /* Jadual responsif */
         .table-responsive {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             margin-top: 15px;
         }
 
-        /* CSS untuk skrin kecil (telefon) */
+        .backup-section {
+            background: #f8f9fa;
+            padding: 10px;
+            margin: 15px 0;
+            border-radius: 5px;
+            text-align: center;
+        }
+
         @media screen and (max-width: 600px) {
             body { margin: 5px; }
             .container { padding: 15px; }
             h2 { font-size: 20px; }
-            .form-group {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            label {
-                width: 100%;
-                margin-bottom: 3px;
-            }
-            input, select {
-                width: 100% !important;
-            }
-            input[type="number"] {
-                width: 100% !important;
-            }
-            .btn {
-                font-size: 13px;
-                padding: 8px 12px;
-            }
-            th, td {
-                font-size: 12px;
-                padding: 6px 2px;
-            }
-            .filter-section input[type="date"] {
-                width: 100%;
-            }
-            .btn-group {
-                display: flex;
-                flex-wrap: wrap;
-            }
-            .btn-group .btn {
-                flex: 1 0 auto;
-            }
+            .form-group { flex-direction: column; align-items: flex-start; }
+            label { width: 100%; margin-bottom: 3px; }
+            input, select { width: 100% !important; }
+            input[type="number"] { width: 100% !important; }
+            .btn { font-size: 13px; padding: 8px 12px; }
+            th, td { font-size: 12px; padding: 6px 2px; }
+            .filter-section input[type="date"] { width: 100%; }
+            .btn-group { display: flex; flex-wrap: wrap; }
+            .btn-group .btn { flex: 1 0 auto; }
         }
 
         @media print {
@@ -168,12 +139,7 @@
             .page.active { display: none; }
             #resit-print { display: block !important; }
             #resit-print table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-            #resit-print th, #resit-print td {
-                border: 1px solid #000;
-                padding: 5px;
-                font-size: 12px;
-                text-align: center;
-            }
+            #resit-print th, #resit-print td { border: 1px solid #000; padding: 5px; font-size: 12px; text-align: center; }
             #resit-print th { background: #ddd; }
             .header-kiri { float: left; font-weight: bold; font-size: 18px; }
             .header-kanan { float: right; font-size: 14px; }
@@ -205,7 +171,6 @@
         </div>
         <button class="btn btn-success" onclick="tambahProduk()">+ Tambah Produk</button>
 
-        <!-- Bar mod pemilihan -->
         <div id="select-mode-bar" class="select-mode-bar">
             <span id="bilangan-dipilih">0 dipilih</span>
             <div>
@@ -232,6 +197,13 @@
 
         <div class="btn-group">
             <button class="btn btn-primary" onclick="simpanSetup()">💾 Simpan & Pergi ke Rekod Jualan</button>
+        </div>
+
+        <!-- Bahagian Backup/Restore -->
+        <div class="backup-section">
+            <button class="btn btn-backup" onclick="backupData()">💾 Backup Data</button>
+            <button class="btn btn-info" onclick="restoreData()">📂 Pulihkan Backup</button>
+            <input type="file" id="file-restore" accept=".json" style="display:none;" onchange="prosesRestore(this)">
         </div>
     </div>
 
@@ -278,15 +250,7 @@
             <table id="senarai-jualan">
                 <thead>
                     <tr>
-                        <th>No</th>
-                        <th>Tarikh</th>
-                        <th>Produk</th>
-                        <th>Dihantar</th>
-                        <th>Tambahan</th>
-                        <th>Terjual</th>
-                        <th>Harga (RM)</th>
-                        <th>Jumlah (RM)</th>
-                        <th>Padam</th>
+                        <th>No</th><th>Tarikh</th><th>Produk</th><th>Dihantar</th><th>Tambahan</th><th>Terjual</th><th>Harga (RM)</th><th>Jumlah (RM)</th><th>Padam</th>
                     </tr>
                 </thead>
                 <tbody id="isi-senarai-jualan"></tbody>
@@ -294,6 +258,11 @@
         </div>
 
         <button class="btn btn-warning" onclick="kembaliKeSetup()">🔙 Kembali ke Setup</button>
+
+        <div class="backup-section">
+            <button class="btn btn-backup" onclick="backupData()">💾 Backup Data</button>
+            <button class="btn btn-info" onclick="restoreData()">📂 Pulihkan Backup</button>
+        </div>
     </div>
 </div>
 
@@ -320,7 +289,7 @@
 </div>
 
 <script>
-    // Fungsi format tarikh
+    // Format tarikh
     function formatTarikh(tarikhStr) {
         if (!tarikhStr) return '';
         const [tahun, bulan, hari] = tarikhStr.split('-');
@@ -339,7 +308,17 @@
     const pageSetup = document.getElementById('page-setup');
     const pageJualan = document.getElementById('page-jualan');
 
+    // Mohon persistent storage
+    async function mintaPersistentStorage() {
+        if (navigator.storage && navigator.storage.persist) {
+            const isPersisted = await navigator.storage.persist();
+            console.log(`Persistent storage granted: ${isPersisted}`);
+        }
+    }
+
     window.onload = function() {
+        mintaPersistentStorage();
+
         const hariIni = new Date();
         document.getElementById('tarikh-jualan').valueAsDate = hariIni;
         const tigaHariLepas = new Date(hariIni);
@@ -365,20 +344,14 @@
     function tambahProduk() {
         const nama = document.getElementById('setup-nama-produk').value.trim();
         const harga = parseFloat(document.getElementById('setup-harga').value);
-
-        if (!nama || isNaN(harga)) {
-            alert('Isi nama produk dan harga yang sah.');
-            return;
-        }
-        if (harga <= 0) {
-            alert('Harga produk mesti lebih daripada RM 0.00.');
+        if (!nama || isNaN(harga) || harga <= 0) {
+            alert('Isi nama produk dan harga yang sah (harga > 0).');
             return;
         }
         if (senaraiProduk.some(p => p.nama.toLowerCase() === nama.toLowerCase())) {
-            alert('Produk ini sudah ada dalam senarai.');
+            alert('Produk ini sudah ada.');
             return;
         }
-
         senaraiProduk.push({ nama, harga });
         simpanData('produk', senaraiProduk);
         paparJadualProduk();
@@ -408,7 +381,6 @@
         tbody.innerHTML = '';
         senaraiProduk.forEach((produk, index) => {
             const tr = document.createElement('tr');
-
             const tdPilih = document.createElement('td');
             tdPilih.style.display = modPilih ? '' : 'none';
             const chk = document.createElement('input');
@@ -436,10 +408,8 @@
                 tdTindakan.appendChild(btnPadam);
             }
             tr.appendChild(tdTindakan);
-
             tbody.appendChild(tr);
         });
-
         kemaskiniBilanganDipilih();
     }
 
@@ -447,21 +417,17 @@
     function tamatModPilih() { modPilih = false; paparJadualProduk(); }
 
     function kemaskiniBilanganDipilih() {
-        const semuaCheckbox = document.querySelectorAll('#isi-jadual-produk input[type="checkbox"]');
-        const dipilih = Array.from(semuaCheckbox).filter(chk => chk.checked).length;
+        const semua = document.querySelectorAll('#isi-jadual-produk input[type="checkbox"]');
+        const dipilih = Array.from(semua).filter(chk => chk.checked).length;
         document.getElementById('bilangan-dipilih').textContent = dipilih + ' dipilih';
     }
 
     function padamProdukDipilih() {
-        const semuaCheckbox = document.querySelectorAll('#isi-jadual-produk input[type="checkbox"]');
+        const semua = document.querySelectorAll('#isi-jadual-produk input[type="checkbox"]');
         const indeksUntukPadam = [];
-        semuaCheckbox.forEach((chk, idx) => { if (chk.checked) indeksUntukPadam.push(idx); });
-        if (indeksUntukPadam.length === 0) {
-            alert('Tiada produk dipilih.');
-            return;
-        }
-        if (!confirm('Padam ' + indeksUntukPadam.length + ' produk yang dipilih?')) return;
-
+        semua.forEach((chk, idx) => { if (chk.checked) indeksUntukPadam.push(idx); });
+        if (indeksUntukPadam.length === 0) { alert('Tiada produk dipilih.'); return; }
+        if (!confirm('Padam ' + indeksUntukPadam.length + ' produk?')) return;
         indeksUntukPadam.sort((a,b) => b - a);
         indeksUntukPadam.forEach(i => senaraiProduk.splice(i, 1));
         simpanData('produk', senaraiProduk);
@@ -481,14 +447,8 @@
 
     function simpanSetup() {
         const syarikat = document.getElementById('setup-nama-syarikat').value.trim();
-        if (!syarikat) {
-            alert('Sila isi nama syarikat.');
-            return;
-        }
-        if (senaraiProduk.length === 0) {
-            alert('Tambahkan sekurang-kurangnya satu produk.');
-            return;
-        }
+        if (!syarikat) { alert('Sila isi nama syarikat.'); return; }
+        if (senaraiProduk.length === 0) { alert('Tambahkan sekurang-kurangnya satu produk.'); return; }
         namaSyarikat = syarikat;
         simpanData('syarikat', namaSyarikat);
         isiDropdownProduk();
@@ -514,10 +474,7 @@
 
     document.getElementById('pilih-produk').addEventListener('change', function() {
         const index = this.value;
-        if (index === '') {
-            document.getElementById('harga-produk-auto').value = '0.00';
-            return;
-        }
+        if (index === '') { document.getElementById('harga-produk-auto').value = '0.00'; return; }
         const produk = senaraiProduk[parseInt(index)];
         document.getElementById('harga-produk-auto').value = produk.harga.toFixed(2);
     });
@@ -525,15 +482,11 @@
     function tambahItem() {
         const tarikh = document.getElementById('tarikh-jualan').value;
         const indeksProduk = document.getElementById('pilih-produk').value;
-        if (!tarikh || indeksProduk === '') {
-            alert('Pilih tarikh dan produk.');
-            return;
-        }
+        if (!tarikh || indeksProduk === '') { alert('Pilih tarikh dan produk.'); return; }
         const produk = senaraiProduk[parseInt(indeksProduk)];
 
-        const sudahAda = rekodJualan.some(item => item.tarikh === tarikh && item.produk === produk.nama);
-        if (sudahAda) {
-            alert(`Produk "${produk.nama}" sudah direkodkan pada tarikh ${formatTarikh(tarikh)}. Sila pilih tarikh lain atau padam rekod terdahulu.`);
+        if (rekodJualan.some(item => item.tarikh === tarikh && item.produk === produk.nama)) {
+            alert(`Produk "${produk.nama}" sudah direkodkan pada tarikh ${formatTarikh(tarikh)}.`);
             return;
         }
 
@@ -542,12 +495,11 @@
         const terjual = parseInt(document.getElementById('bil-terjual').value);
 
         if (isNaN(dihantar) || dihantar < 0 || isNaN(tambahan) || tambahan < 0 || isNaN(terjual) || terjual < 0) {
-            alert('Bilangan dihantar, tambahan, dan terjual tidak boleh negatif. Sila betulkan.');
+            alert('Semua bilangan mesti nombor positif.');
             return;
         }
-
         if ((dihantar + tambahan) < terjual) {
-            alert('Ralat: Jumlah Dihantar + Tambahan (' + (dihantar + tambahan) + ') kurang daripada Bilangan Terjual (' + terjual + '). Sila betulkan.');
+            alert('Dihantar + Tambahan tidak boleh kurang daripada Terjual.');
             return;
         }
 
@@ -555,7 +507,6 @@
         rekodJualan.push({ tarikh, produk: produk.nama, dihantar, tambahan, terjual, harga: produk.harga, jumlah });
         simpanData('jualan', rekodJualan);
         paparSenaraiJualan();
-
         document.getElementById('bil-dihantar').value = '0';
         document.getElementById('bil-tambahan').value = '0';
         document.getElementById('bil-terjual').value = '0';
@@ -591,24 +542,80 @@
         }
     }
 
+    // ========== BACKUP & RESTORE ==========
+    function backupData() {
+        const data = {
+            syarikat: namaSyarikat,
+            produk: senaraiProduk,
+            jualan: rekodJualan
+        };
+        const jsonStr = JSON.stringify(data, null, 2);
+        const blob = new Blob([jsonStr], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const timestamp = new Date().toISOString().slice(0,10);
+        a.href = url;
+        a.download = `jualan_backup_${timestamp}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        alert('Backup berjaya dimuat turun!');
+    }
+
+    function restoreData() {
+        document.getElementById('file-restore').click();
+    }
+
+    function prosesRestore(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (data.syarikat && data.produk && data.jualan) {
+                    if (confirm('Ini akan menggantikan semua data sedia ada. Teruskan?')) {
+                        namaSyarikat = data.syarikat;
+                        senaraiProduk = data.produk;
+                        rekodJualan = data.jualan;
+                        simpanData('syarikat', namaSyarikat);
+                        simpanData('produk', senaraiProduk);
+                        simpanData('jualan', rekodJualan);
+                        alert('Data berjaya dipulihkan!');
+                        // Refresh UI
+                        paparJadualProduk();
+                        isiDropdownProduk();
+                        paparSenaraiJualan();
+                        document.getElementById('setup-nama-syarikat').value = namaSyarikat;
+                    }
+                } else {
+                    alert('Fail backup tidak sah.');
+                }
+            } catch (err) {
+                alert('Fail tidak boleh dibaca.');
+            }
+        };
+        reader.readAsText(file);
+    }
+
     // ========== CETAKAN ==========
     function cetakResit() {
+        // Tanya backup dulu
+        if (confirm('Sebelum cetak, ingin buat backup data dahulu?')) {
+            backupData();
+        }
+
         const dari = document.getElementById('dari-tarikh').value;
         const hingga = document.getElementById('hingga-tarikh').value;
-        if (!dari || !hingga) {
-            alert('Pilih tarikh mula dan tamat.');
-            return;
-        }
+        if (!dari || !hingga) { alert('Pilih tarikh mula dan tamat.'); return; }
         const mula = new Date(dari + 'T00:00:00');
         const tamat = new Date(hingga + 'T23:59:59');
         const rekodTapis = rekodJualan.filter(item => {
             const t = new Date(item.tarikh + 'T00:00:00');
             return t >= mula && t <= tamat;
         });
-        if (rekodTapis.length === 0) {
-            alert('Tiada rekod dalam tempoh ini.');
-            return;
-        }
+        if (rekodTapis.length === 0) { alert('Tiada rekod dalam tempoh ini.'); return; }
 
         document.getElementById('cetak-nama-syarikat').innerText = namaSyarikat;
         const sekarang = new Date();
@@ -631,7 +638,6 @@
             jumlahBesar += item.jumlah;
         });
 
-        // Ringkasan harian
         const jumlahPerHari = {};
         rekodTapis.forEach(item => {
             if (!jumlahPerHari[item.tarikh]) jumlahPerHari[item.tarikh] = 0;
