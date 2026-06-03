@@ -5,159 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aplikasi Jualan - Setup & Rekod</title>
     <style>
-        * {
-            box-sizing: border-box;
-        }
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background: #f0f2f5;
-        }
-        .container {
-            max-width: 800px;
-            margin: auto;
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        h2 {
-            text-align: center;
-            color: #2c3e50;
-            margin-top: 0;
-        }
-        .page {
-            display: none;
-        }
-        .page.active {
-            display: block;
-        }
-        .btn {
-            padding: 8px 18px;
-            margin: 5px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .btn-primary {
-            background: #3498db;
-            color: white;
-        }
-        .btn-success {
-            background: #27ae60;
-            color: white;
-        }
-        .btn-warning {
-            background: #f39c12;
-            color: white;
-        }
-        .btn-danger {
-            background: #e74c3c;
-            color: white;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: inline-block;
-            width: 150px;
-            font-weight: bold;
-        }
-        input, select {
-            padding: 8px;
-            width: 250px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        input[type="number"] {
-            width: 120px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: center;
-        }
-        th {
-            background: #f8f9fa;
-        }
-        .total-row {
-            font-weight: bold;
-            background: #e9ecef;
-        }
-        .btn-group {
-            margin: 15px 0;
-        }
-        .filter-section {
-            background: #e9ecef;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 15px 0;
-        }
-        .filter-section label {
-            width: auto;
-            margin-right: 5px;
-        }
-        .filter-section input[type="date"] {
-            width: 150px;
-        }
+        * { box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f0f2f5; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #2c3e50; margin-top: 0; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .btn { padding: 8px 18px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-primary { background: #3498db; color: white; }
+        .btn-success { background: #27ae60; color: white; }
+        .btn-warning { background: #f39c12; color: white; }
+        .btn-danger { background: #e74c3c; color: white; }
+        .form-group { margin-bottom: 15px; }
+        label { display: inline-block; width: 150px; font-weight: bold; }
+        input, select { padding: 8px; width: 250px; border: 1px solid #ccc; border-radius: 4px; }
+        input[type="number"] { width: 120px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+        th { background: #f8f9fa; }
+        .total-row { font-weight: bold; background: #e9ecef; }
+        .btn-group { margin: 15px 0; }
+        .filter-section { background: #e9ecef; padding: 10px; border-radius: 5px; margin: 15px 0; }
+        .filter-section label { width: auto; margin-right: 5px; }
+        .filter-section input[type="date"] { width: 150px; }
 
-        /* Cetakan */
         @media print {
-            body {
-                background: white;
-                margin: 0;
-            }
-            .container {
-                box-shadow: none;
-                padding: 0;
-            }
-            .page.active {
-                display: none; /* Sembunyikan semua page */
-            }
-            #resit-print {
-                display: block !important;
-            }
-            #resit-print table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 20px;
-            }
-            #resit-print th, #resit-print td {
-                border: 1px solid #000;
-                padding: 5px;
-                font-size: 12px;
-                text-align: center;
-            }
-            #resit-print th {
-                background: #ddd;
-            }
-            .header-kiri {
-                float: left;
-                font-weight: bold;
-                font-size: 18px;
-            }
-            .header-kanan {
-                float: right;
-                font-size: 14px;
-            }
-            .clearfix::after {
-                content: "";
-                clear: both;
-                display: table;
-            }
-            .jarak-empat {
-                margin-top: 4em;
-            }
+            body { background: white; margin: 0; }
+            .container { box-shadow: none; padding: 0; }
+            .page.active { display: none; }
+            #resit-print { display: block !important; }
+            #resit-print table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            #resit-print th, #resit-print td { border: 1px solid #000; padding: 5px; font-size: 12px; text-align: center; }
+            #resit-print th { background: #ddd; }
+            .header-kiri { float: left; font-weight: bold; font-size: 18px; }
+            .header-kanan { float: right; font-size: 14px; }
+            .clearfix::after { content: ""; clear: both; display: table; }
+            .jarak-empat { margin-top: 4em; }
         }
-        #resit-print {
-            display: none;
-        }
+        #resit-print { display: none; }
     </style>
 </head>
 <body>
@@ -182,12 +67,8 @@
         <button class="btn btn-success" onclick="tambahProduk()">+ Tambah Produk</button>
 
         <table id="jadual-produk">
-            <thead>
-                <tr><th>Nama Produk</th><th>Harga (RM)</th><th>Tindakan</th></tr>
-            </thead>
-            <tbody id="isi-jadual-produk">
-                <tr><td colspan="3">Tiada produk. Sila tambah.</td></tr>
-            </tbody>
+            <thead><tr><th>Nama Produk</th><th>Harga (RM)</th><th>Tindakan</th></tr></thead>
+            <tbody id="isi-jadual-produk"><tr><td colspan="3">Tiada produk. Sila tambah.</td></tr></tbody>
         </table>
 
         <div class="btn-group">
@@ -204,9 +85,7 @@
         </div>
         <div class="form-group">
             <label>Pilih Produk:</label>
-            <select id="pilih-produk">
-                <option value="">-- Pilih Produk --</option>
-            </select>
+            <select id="pilih-produk"><option value="">-- Pilih Produk --</option></select>
         </div>
         <div class="form-group">
             <label>Harga (auto):</label>
@@ -226,7 +105,6 @@
         </div>
         <button class="btn btn-success" onclick="tambahItem()">+ Tambah Rekod</button>
 
-        <!-- Tapisan cetakan -->
         <div class="filter-section">
             <strong>Cetak untuk tempoh:</strong><br>
             <label>Dari:</label>
@@ -236,14 +114,9 @@
             <button class="btn btn-primary" onclick="cetakResit()">🖨️ Cetak Resit</button>
         </div>
 
-        <!-- Senarai jualan -->
         <h3>📌 Rekod Tersimpan</h3>
         <table id="senarai-jualan">
-            <thead>
-                <tr>
-                    <th>No</th><th>Tarikh</th><th>Produk</th><th>Dihantar</th><th>Tambahan</th><th>Terjual</th><th>Harga (RM)</th><th>Jumlah (RM)</th><th>Padam</th>
-                </tr>
-            </thead>
+            <thead><tr><th>No</th><th>Tarikh</th><th>Produk</th><th>Dihantar</th><th>Tambahan</th><th>Terjual</th><th>Harga (RM)</th><th>Jumlah (RM)</th><th>Padam</th></tr></thead>
             <tbody id="isi-senarai-jualan"></tbody>
         </table>
 
@@ -259,47 +132,27 @@
     </div>
     <div class="jarak-empat"></div>
     <table>
-        <thead>
-            <tr>
-                <th>No</th><th>Tarikh</th><th>Nama Produk</th><th>Bil. Dihantar</th><th>Bil. Tambahan</th><th>Bil. Terjual</th><th>Harga (RM)</th><th>Jumlah (RM)</th>
-            </tr>
-        </thead>
+        <thead><tr><th>No</th><th>Tarikh</th><th>Nama Produk</th><th>Bil. Dihantar</th><th>Bil. Tambahan</th><th>Bil. Terjual</th><th>Harga (RM)</th><th>Jumlah (RM)</th></tr></thead>
         <tbody id="cetak-isi"></tbody>
-        <tfoot>
-            <tr class="total-row">
-                <td colspan="7" style="text-align:right;">Jumlah Keseluruhan:</td>
-                <td id="cetak-jumlah-besar"></td>
-            </tr>
-        </tfoot>
+        <tfoot><tr class="total-row"><td colspan="7" style="text-align:right;">Jumlah Keseluruhan:</td><td id="cetak-jumlah-besar"></td></tr></tfoot>
     </table>
 </div>
 
 <script>
-    // *** DATA TEMPATAN (localStorage) ***
-    function simpanData(key, data) {
-        localStorage.setItem(key, JSON.stringify(data));
-    }
-    function ambilData(key) {
-        const data = localStorage.getItem(key);
-        return data ? JSON.parse(data) : null;
-    }
+    function simpanData(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
+    function ambilData(key) { const data = localStorage.getItem(key); return data ? JSON.parse(data) : null; }
 
-    // Inisialisasi data
     let senaraiProduk = ambilData('produk') || [];
     let namaSyarikat = ambilData('syarikat') || '';
     let rekodJualan = ambilData('jualan') || [];
 
-    // Papar ikut halaman
     const pageSetup = document.getElementById('page-setup');
     const pageJualan = document.getElementById('page-jualan');
 
-    // Mula-mula papar setup jika tiada produk atau syarikat
     window.onload = function() {
         if (namaSyarikat) document.getElementById('setup-nama-syarikat').value = namaSyarikat;
         paparJadualProduk();
         isiDropdownProduk();
-
-        // Jika sudah ada produk dan syarikat, boleh terus ke page jualan
         if (namaSyarikat && senaraiProduk.length > 0) {
             pageSetup.classList.remove('active');
             pageJualan.classList.add('active');
@@ -307,76 +160,44 @@
             pageSetup.classList.add('active');
             pageJualan.classList.remove('active');
         }
-
-        // Tetapkan tarikh lalai
         const hariIni = new Date();
         document.getElementById('tarikh-jualan').valueAsDate = hariIni;
         const tigaHariLepas = new Date(hariIni);
         tigaHariLepas.setDate(hariIni.getDate() - 2);
         document.getElementById('dari-tarikh').valueAsDate = tigaHariLepas;
         document.getElementById('hingga-tarikh').valueAsDate = hariIni;
-
         paparSenaraiJualan();
     };
 
-    // *** FUNGSI SETUP ***
     function tambahProduk() {
         const nama = document.getElementById('setup-nama-produk').value.trim();
         const harga = parseFloat(document.getElementById('setup-harga').value);
-        if (!nama || isNaN(harga) || harga <= 0) {
-            alert('Isi nama produk dan harga yang sah.');
-            return;
-        }
-        // Cegah duplikasi nama
-        if (senaraiProduk.some(p => p.nama.toLowerCase() === nama.toLowerCase())) {
-            alert('Produk ini sudah ada.');
-            return;
-        }
+        if (!nama || isNaN(harga) || harga <= 0) { alert('Isi nama produk dan harga yang sah.'); return; }
+        if (senaraiProduk.some(p => p.nama.toLowerCase() === nama.toLowerCase())) { alert('Produk ini sudah ada.'); return; }
         senaraiProduk.push({ nama, harga });
         simpanData('produk', senaraiProduk);
         paparJadualProduk();
-        // Kosongkan input
         document.getElementById('setup-nama-produk').value = '';
         document.getElementById('setup-harga').value = '0.00';
     }
 
     function paparJadualProduk() {
         const tbody = document.getElementById('isi-jadual-produk');
-        if (senaraiProduk.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3">Tiada produk. Sila tambah.</td></tr>';
-            return;
-        }
+        if (senaraiProduk.length === 0) { tbody.innerHTML = '<tr><td colspan="3">Tiada produk. Sila tambah.</td></tr>'; return; }
         tbody.innerHTML = '';
         senaraiProduk.forEach((produk, index) => {
-            tbody.innerHTML += `
-                <tr>
-                    <td>${produk.nama}</td>
-                    <td>${produk.harga.toFixed(2)}</td>
-                    <td><button class="btn btn-danger" onclick="padamProduk(${index})">Padam</button></td>
-                </tr>
-            `;
+            tbody.innerHTML += `<tr><td>${produk.nama}</td><td>${produk.harga.toFixed(2)}</td><td><button class="btn btn-danger" onclick="padamProduk(${index})">Padam</button></td></tr>`;
         });
     }
 
     function padamProduk(index) {
-        if (confirm('Padam produk ini?')) {
-            senaraiProduk.splice(index, 1);
-            simpanData('produk', senaraiProduk);
-            paparJadualProduk();
-            isiDropdownProduk(); // kemaskini dropdown di page jualan
-        }
+        if (confirm('Padam produk ini?')) { senaraiProduk.splice(index, 1); simpanData('produk', senaraiProduk); paparJadualProduk(); isiDropdownProduk(); }
     }
 
     function simpanSetup() {
         const syarikat = document.getElementById('setup-nama-syarikat').value.trim();
-        if (!syarikat) {
-            alert('Sila isi nama syarikat.');
-            return;
-        }
-        if (senaraiProduk.length === 0) {
-            alert('Tambahkan sekurang-kurangnya satu produk.');
-            return;
-        }
+        if (!syarikat) { alert('Sila isi nama syarikat.'); return; }
+        if (senaraiProduk.length === 0) { alert('Tambahkan sekurang-kurangnya satu produk.'); return; }
         namaSyarikat = syarikat;
         simpanData('syarikat', namaSyarikat);
         isiDropdownProduk();
@@ -390,53 +211,42 @@
         document.getElementById('setup-nama-syarikat').value = namaSyarikat;
     }
 
-    // *** FUNGSI JUALAN ***
     function isiDropdownProduk() {
         const select = document.getElementById('pilih-produk');
         select.innerHTML = '<option value="">-- Pilih Produk --</option>';
-        senaraiProduk.forEach((produk, index) => {
-            select.innerHTML += `<option value="${index}">${produk.nama}</option>`;
-        });
-        // Reset harga paparan
+        senaraiProduk.forEach((produk, index) => { select.innerHTML += `<option value="${index}">${produk.nama}</option>`; });
         document.getElementById('harga-produk-auto').value = '0.00';
     }
 
-    // Apabila pengguna pilih produk, auto isi harga
     document.getElementById('pilih-produk').addEventListener('change', function() {
         const index = this.value;
-        if (index === '') {
-            document.getElementById('harga-produk-auto').value = '0.00';
-            return;
-        }
+        if (index === '') { document.getElementById('harga-produk-auto').value = '0.00'; return; }
         const produk = senaraiProduk[parseInt(index)];
         document.getElementById('harga-produk-auto').value = produk.harga.toFixed(2);
     });
 
+    // *** Fungsi tambahItem dengan pengesahan produk+tarikh unik ***
     function tambahItem() {
         const tarikh = document.getElementById('tarikh-jualan').value;
         const indeksProduk = document.getElementById('pilih-produk').value;
-        if (!tarikh || indeksProduk === '') {
-            alert('Pilih tarikh dan produk.');
+        if (!tarikh || indeksProduk === '') { alert('Pilih tarikh dan produk.'); return; }
+        const produk = senaraiProduk[parseInt(indeksProduk)];
+
+        // Semak kewujudan rekod dengan produk dan tarikh yang sama
+        const sudahAda = rekodJualan.some(item => item.tarikh === tarikh && item.produk === produk.nama);
+        if (sudahAda) {
+            alert(`Produk "${produk.nama}" sudah direkodkan pada tarikh ${tarikh}. Sila pilih tarikh lain atau padam rekod terdahulu.`);
             return;
         }
-        const produk = senaraiProduk[parseInt(indeksProduk)];
+
         const dihantar = parseInt(document.getElementById('bil-dihantar').value) || 0;
         const tambahan = parseInt(document.getElementById('bil-tambahan').value) || 0;
         const terjual = parseInt(document.getElementById('bil-terjual').value) || 0;
         const jumlah = terjual * produk.harga;
 
-        rekodJualan.push({
-            tarikh,
-            produk: produk.nama,
-            dihantar,
-            tambahan,
-            terjual,
-            harga: produk.harga,
-            jumlah
-        });
+        rekodJualan.push({ tarikh, produk: produk.nama, dihantar, tambahan, terjual, harga: produk.harga, jumlah });
         simpanData('jualan', rekodJualan);
         paparSenaraiJualan();
-        // Reset input bilangan
         document.getElementById('bil-dihantar').value = '0';
         document.getElementById('bil-tambahan').value = '0';
         document.getElementById('bil-terjual').value = '0';
@@ -444,54 +254,28 @@
 
     function paparSenaraiJualan() {
         const tbody = document.getElementById('isi-senarai-jualan');
-        if (rekodJualan.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="9">Tiada rekod jualan.</td></tr>';
-            return;
-        }
+        if (rekodJualan.length === 0) { tbody.innerHTML = '<tr><td colspan="9">Tiada rekod jualan.</td></tr>'; return; }
         tbody.innerHTML = '';
         rekodJualan.forEach((item, index) => {
-            tbody.innerHTML += `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td>${item.tarikh}</td>
-                    <td>${item.produk}</td>
-                    <td>${item.dihantar}</td>
-                    <td>${item.tambahan}</td>
-                    <td>${item.terjual}</td>
-                    <td>${item.harga.toFixed(2)}</td>
-                    <td>${item.jumlah.toFixed(2)}</td>
-                    <td><button class="btn btn-danger" onclick="padamRekod(${index})">X</button></td>
-                </tr>
-            `;
+            tbody.innerHTML += `<tr><td>${index+1}</td><td>${item.tarikh}</td><td>${item.produk}</td><td>${item.dihantar}</td><td>${item.tambahan}</td><td>${item.terjual}</td><td>${item.harga.toFixed(2)}</td><td>${item.jumlah.toFixed(2)}</td><td><button class="btn btn-danger" onclick="padamRekod(${index})">X</button></td></tr>`;
         });
     }
 
     function padamRekod(index) {
-        if (confirm('Padam rekod ini?')) {
-            rekodJualan.splice(index, 1);
-            simpanData('jualan', rekodJualan);
-            paparSenaraiJualan();
-        }
+        if (confirm('Padam rekod ini?')) { rekodJualan.splice(index, 1); simpanData('jualan', rekodJualan); paparSenaraiJualan(); }
     }
 
-    // *** CETAKAN ***
     function cetakResit() {
         const dari = document.getElementById('dari-tarikh').value;
         const hingga = document.getElementById('hingga-tarikh').value;
-        if (!dari || !hingga) {
-            alert('Pilih tarikh mula dan tamat.');
-            return;
-        }
+        if (!dari || !hingga) { alert('Pilih tarikh mula dan tamat.'); return; }
         const mula = new Date(dari + 'T00:00:00');
         const tamat = new Date(hingga + 'T23:59:59');
         const rekodTapis = rekodJualan.filter(item => {
             const t = new Date(item.tarikh + 'T00:00:00');
             return t >= mula && t <= tamat;
         });
-        if (rekodTapis.length === 0) {
-            alert('Tiada rekod dalam tempoh ini.');
-            return;
-        }
+        if (rekodTapis.length === 0) { alert('Tiada rekod dalam tempoh ini.'); return; }
 
         document.getElementById('cetak-nama-syarikat').innerText = namaSyarikat;
         const sekarang = new Date();
@@ -501,18 +285,7 @@
         tbody.innerHTML = '';
         let jumlahBesar = 0;
         rekodTapis.forEach((item, i) => {
-            tbody.innerHTML += `
-                <tr>
-                    <td>${i + 1}</td>
-                    <td>${item.tarikh}</td>
-                    <td>${item.produk}</td>
-                    <td>${item.dihantar}</td>
-                    <td>${item.tambahan}</td>
-                    <td>${item.terjual}</td>
-                    <td>${item.harga.toFixed(2)}</td>
-                    <td>${item.jumlah.toFixed(2)}</td>
-                </tr>
-            `;
+            tbody.innerHTML += `<tr><td>${i+1}</td><td>${item.tarikh}</td><td>${item.produk}</td><td>${item.dihantar}</td><td>${item.tambahan}</td><td>${item.terjual}</td><td>${item.harga.toFixed(2)}</td><td>${item.jumlah.toFixed(2)}</td></tr>`;
             jumlahBesar += item.jumlah;
         });
         document.getElementById('cetak-jumlah-besar').innerText = jumlahBesar.toFixed(2);
