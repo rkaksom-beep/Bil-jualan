@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Aplikasi Jualan - Setup & Rekod</title>
-    <!-- html2canvas untuk tangkap gambar resit -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         * { box-sizing: border-box; }
@@ -27,13 +26,13 @@
         .page.active { display: block; }
 
         .btn {
-            padding: 10px 15px;
-            margin: 5px 2px;
+            padding: 8px 12px;
+            margin: 2px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 13px;
         }
         .btn-primary { background: #3498db; color: white; }
         .btn-success { background: #27ae60; color: white; }
@@ -42,7 +41,7 @@
         .btn-secondary { background: #95a5a6; color: white; }
         .btn-info { background: #17a2b8; color: white; }
         .btn-backup { background: #6f42c1; color: white; }
-        .btn-share { background: #25D366; color: white; } /* Warna WhatsApp */
+        .btn-share { background: #25D366; color: white; }
 
         .form-group {
             margin-bottom: 12px;
@@ -68,13 +67,18 @@
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 8px 4px;
+            padding: 6px 4px;
             text-align: center;
-            font-size: 14px;
+            font-size: 13px;
         }
         th { background: #f8f9fa; }
         td { word-break: break-word; }
         .total-row { font-weight: bold; background: #e9ecef; }
+        .edit-input {
+            width: 70px !important;
+            padding: 4px;
+            font-size: 13px;
+        }
 
         .btn-group { margin: 15px 0; }
         .filter-section {
@@ -126,7 +130,6 @@
             margin-top: 5px;
         }
 
-        /* Resit untuk cetakan / tangkapan */
         #resit-print {
             display: none;
             background: white;
@@ -143,8 +146,8 @@
             label { width: 100%; margin-bottom: 3px; }
             input, select { width: 100% !important; }
             input[type="number"] { width: 100% !important; }
-            .btn { font-size: 13px; padding: 8px 12px; }
-            th, td { font-size: 12px; padding: 6px 2px; }
+            .btn { font-size: 12px; padding: 6px 10px; }
+            th, td { font-size: 11px; padding: 4px 2px; }
             .filter-section input[type="date"] { width: 100%; }
             .btn-group { display: flex; flex-wrap: wrap; }
             .btn-group .btn { flex: 1 0 auto; }
@@ -220,7 +223,6 @@
             <button class="btn btn-primary" onclick="simpanSetup()">💾 Simpan & Pergi ke Rekod Jualan</button>
         </div>
 
-        <!-- Bahagian Backup/Restore -->
         <div class="backup-section">
             <button class="btn btn-backup" onclick="backupData()">💾 Backup Data</button>
             <button class="btn btn-info" onclick="restoreData()">📂 Pulihkan Backup</button>
@@ -273,7 +275,7 @@
             <table id="senarai-jualan">
                 <thead>
                     <tr>
-                        <th>No</th><th>Tarikh</th><th>Produk</th><th>Dihantar</th><th>Tambahan</th><th>Terjual</th><th>Harga (RM)</th><th>Jumlah (RM)</th><th>Padam</th>
+                        <th>No</th><th>Tarikh</th><th>Produk</th><th>Dihantar</th><th>Tambahan</th><th>Terjual</th><th>Harga (RM)</th><th>Jumlah (RM)</th><th>Tindakan</th>
                     </tr>
                 </thead>
                 <tbody id="isi-senarai-jualan"></tbody>
@@ -290,7 +292,7 @@
     </div>
 </div>
 
-<!-- Resit untuk cetakan dan tangkapan gambar -->
+<!-- Resit untuk cetakan / kongsi -->
 <div id="resit-print">
     <div class="clearfix">
         <div class="header-kiri" id="cetak-nama-syarikat"></div>
@@ -526,6 +528,68 @@
         document.getElementById('bil-terjual').value = '0';
     }
 
+    // ========== EDIT REKOD (INLINE) ==========
+    function editRekod(index) {
+        const tbody = document.getElementById('isi-senarai-jualan');
+        const rekod = rekodJualan[index];
+        // Gantikan baris dengan form
+        const tr = tbody.children[index];
+        tr.innerHTML = `
+            <td>${index+1}</td>
+            <td>${formatTarikh(rekod.tarikh)}</td>
+            <td>${rekod.produk}</td>
+            <td><input type="number" class="edit-input" id="edit-dihantar-${index}" value="${rekod.dihantar}" min="0"></td>
+            <td><input type="number" class="edit-input" id="edit-tambahan-${index}" value="${rekod.tambahan}" min="0"></td>
+            <td><input type="number" class="edit-input" id="edit-terjual-${index}" value="${rekod.terjual}" min="0"></td>
+            <td>${rekod.harga.toFixed(2)}</td>
+            <td id="edit-jumlah-${index}">${rekod.jumlah.toFixed(2)}</td>
+            <td>
+                <button class="btn btn-success" onclick="simpanEdit(${index})">✔</button>
+                <button class="btn btn-secondary" onclick="batalEdit(${index})">✖</button>
+            </td>
+        `;
+        // Auto kemaskini jumlah bila input berubah (optional)
+        document.getElementById(`edit-dihantar-${index}`).addEventListener('input', () => kiraEdit(index));
+        document.getElementById(`edit-tambahan-${index}`).addEventListener('input', () => kiraEdit(index));
+        document.getElementById(`edit-terjual-${index}`).addEventListener('input', () => kiraEdit(index));
+    }
+
+    function kiraEdit(index) {
+        const dihantar = parseInt(document.getElementById(`edit-dihantar-${index}`).value) || 0;
+        const tambahan = parseInt(document.getElementById(`edit-tambahan-${index}`).value) || 0;
+        const terjual = parseInt(document.getElementById(`edit-terjual-${index}`).value) || 0;
+        const jumlah = terjual * rekodJualan[index].harga;
+        document.getElementById(`edit-jumlah-${index}`).textContent = jumlah.toFixed(2);
+    }
+
+    function simpanEdit(index) {
+        const dihantar = parseInt(document.getElementById(`edit-dihantar-${index}`).value);
+        const tambahan = parseInt(document.getElementById(`edit-tambahan-${index}`).value);
+        const terjual = parseInt(document.getElementById(`edit-terjual-${index}`).value);
+
+        if (isNaN(dihantar) || dihantar < 0 || isNaN(tambahan) || tambahan < 0 || isNaN(terjual) || terjual < 0) {
+            alert('Semua bilangan mesti nombor positif.');
+            return;
+        }
+        if ((dihantar + tambahan) < terjual) {
+            alert('Dihantar + Tambahan tidak boleh kurang daripada Terjual.');
+            return;
+        }
+
+        const rekod = rekodJualan[index];
+        rekod.dihantar = dihantar;
+        rekod.tambahan = tambahan;
+        rekod.terjual = terjual;
+        rekod.jumlah = terjual * rekod.harga;
+        simpanData('jualan', rekodJualan);
+        paparSenaraiJualan();
+    }
+
+    function batalEdit(index) {
+        // Hanya refresh paparan seperti asal
+        paparSenaraiJualan();
+    }
+
     function paparSenaraiJualan() {
         const tbody = document.getElementById('isi-senarai-jualan');
         if (rekodJualan.length === 0) {
@@ -534,7 +598,8 @@
         }
         tbody.innerHTML = '';
         rekodJualan.forEach((item, index) => {
-            tbody.innerHTML += `<tr>
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
                 <td>${index+1}</td>
                 <td>${formatTarikh(item.tarikh)}</td>
                 <td>${item.produk}</td>
@@ -543,8 +608,12 @@
                 <td>${item.terjual}</td>
                 <td>${item.harga.toFixed(2)}</td>
                 <td>${item.jumlah.toFixed(2)}</td>
-                <td><button class="btn btn-danger" onclick="padamRekod(${index})">X</button></td>
-            </tr>`;
+                <td>
+                    <button class="btn btn-info" onclick="editRekod(${index})">✎</button>
+                    <button class="btn btn-danger" onclick="padamRekod(${index})">✖</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
         });
     }
 
@@ -558,11 +627,7 @@
 
     // ========== BACKUP & RESTORE ==========
     function backupData() {
-        const data = {
-            syarikat: namaSyarikat,
-            produk: senaraiProduk,
-            jualan: rekodJualan
-        };
+        const data = { syarikat: namaSyarikat, produk: senaraiProduk, jualan: rekodJualan };
         const jsonStr = JSON.stringify(data, null, 2);
         const blob = new Blob([jsonStr], {type: 'application/json'});
         const url = URL.createObjectURL(blob);
@@ -572,15 +637,9 @@
         if (navigator.share && navigator.canShare) {
             const fail = new File([blob], namaFail, { type: 'application/json' });
             if (navigator.canShare({ files: [fail] })) {
-                navigator.share({
-                    files: [fail],
-                    title: 'Backup Data Jualan',
-                    text: 'Simpan fail ini untuk backup data jualan anda.'
-                }).then(() => {
-                    alert('Backup berjaya dikongsi!');
-                }).catch(() => {
-                    muatTurunBackup(url, namaFail);
-                });
+                navigator.share({ files: [fail], title: 'Backup Data Jualan', text: 'Simpan fail ini untuk backup data jualan anda.' })
+                .then(() => alert('Backup berjaya dikongsi!'))
+                .catch(() => muatTurunBackup(url, namaFail));
                 return;
             }
         }
@@ -633,24 +692,18 @@
         reader.readAsText(file);
     }
 
-    // ========== SEDIAKAN RESIT (untuk cetak & kongsi) ==========
+    // ========== SEDIAKAN RESIT ==========
     function sediakanResit() {
         const dari = document.getElementById('dari-tarikh').value;
         const hingga = document.getElementById('hingga-tarikh').value;
-        if (!dari || !hingga) {
-            alert('Pilih tarikh mula dan tamat.');
-            return null;
-        }
+        if (!dari || !hingga) { alert('Pilih tarikh mula dan tamat.'); return null; }
         const mula = new Date(dari + 'T00:00:00');
         const tamat = new Date(hingga + 'T23:59:59');
         const rekodTapis = rekodJualan.filter(item => {
             const t = new Date(item.tarikh + 'T00:00:00');
             return t >= mula && t <= tamat;
         });
-        if (rekodTapis.length === 0) {
-            alert('Tiada rekod dalam tempoh ini.');
-            return null;
-        }
+        if (rekodTapis.length === 0) { alert('Tiada rekod dalam tempoh ini.'); return null; }
 
         document.getElementById('cetak-nama-syarikat').innerText = namaSyarikat;
         const sekarang = new Date();
@@ -661,19 +714,12 @@
         let jumlahBesar = 0;
         rekodTapis.forEach((item, i) => {
             tbody.innerHTML += `<tr>
-                <td>${i+1}</td>
-                <td>${formatTarikh(item.tarikh)}</td>
-                <td>${item.produk}</td>
-                <td>${item.dihantar}</td>
-                <td>${item.tambahan}</td>
-                <td>${item.terjual}</td>
-                <td>${item.harga.toFixed(2)}</td>
-                <td>${item.jumlah.toFixed(2)}</td>
-            </tr>`;
+                <td>${i+1}</td><td>${formatTarikh(item.tarikh)}</td><td>${item.produk}</td>
+                <td>${item.dihantar}</td><td>${item.tambahan}</td><td>${item.terjual}</td>
+                <td>${item.harga.toFixed(2)}</td><td>${item.jumlah.toFixed(2)}</td></tr>`;
             jumlahBesar += item.jumlah;
         });
 
-        // Ringkasan harian
         const jumlahPerHari = {};
         rekodTapis.forEach(item => {
             if (!jumlahPerHari[item.tarikh]) jumlahPerHari[item.tarikh] = 0;
@@ -681,66 +727,42 @@
         });
         const tarikhUnik = Object.keys(jumlahPerHari).sort();
         let htmlRingkasan = '<strong>Ringkasan Jualan Mengikut Hari:</strong><br>';
-        tarikhUnik.forEach(t => {
-            htmlRingkasan += `${formatTarikh(t)}: RM ${jumlahPerHari[t].toFixed(2)}<br>`;
-        });
+        tarikhUnik.forEach(t => htmlRingkasan += `${formatTarikh(t)}: RM ${jumlahPerHari[t].toFixed(2)}<br>`);
         htmlRingkasan += `<strong>Jumlah Keseluruhan: RM ${jumlahBesar.toFixed(2)}</strong>`;
         document.getElementById('ringkasan-harian').innerHTML = htmlRingkasan;
         document.getElementById('cetak-jumlah-besar').innerText = jumlahBesar.toFixed(2);
-
-        return true; // berjaya
+        return true;
     }
 
-    // ========== CETAK ==========
     function cetakResit() {
-        if (sediakanResit()) {
-            window.print();
-        }
+        if (sediakanResit()) window.print();
     }
 
-    // ========== KONGSI RESIT SEBAGAI GAMBAR ==========
     async function kongsiResit() {
         if (!sediakanResit()) return;
-
-        // Tanya backup dulu
-        if (confirm('Sebelum kongsi, ingin buat backup data dahulu?')) {
-            backupData();
-        }
+        if (confirm('Sebelum kongsi, ingin buat backup data dahulu?')) backupData();
 
         const resitDiv = document.getElementById('resit-print');
-        // Paparkan sementara untuk tangkapan (kekal tersembunyi dari penglihatan)
         resitDiv.style.display = 'block';
         resitDiv.style.position = 'absolute';
         resitDiv.style.left = '-9999px';
         resitDiv.style.top = '0';
-        resitDiv.style.width = '800px'; // lebar sesuai untuk imej
+        resitDiv.style.width = '800px';
         resitDiv.style.background = 'white';
 
         try {
-            const canvas = await html2canvas(resitDiv, {
-                scale: 2,
-                backgroundColor: '#ffffff',
-                logging: false
-            });
+            const canvas = await html2canvas(resitDiv, { scale: 2, backgroundColor: '#ffffff', logging: false });
             const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
             const file = new File([blob], 'resit_jualan.png', { type: 'image/png' });
 
             if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                await navigator.share({
-                    files: [file],
-                    title: 'Resit Jualan',
-                    text: 'Resit jualan tempoh dipilih.'
-                });
+                await navigator.share({ files: [file], title: 'Resit Jualan', text: 'Resit jualan tempoh dipilih.' });
                 alert('Resit berjaya dikongsi!');
             } else {
-                // Fallback muat turun imej
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
-                a.href = url;
-                a.download = 'resit_jualan.png';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
+                a.href = url; a.download = 'resit_jualan.png';
+                document.body.appendChild(a); a.click(); document.body.removeChild(a);
                 URL.revokeObjectURL(url);
                 alert('Peranti tidak menyokong kongsi imej.\nImej resit dimuat turun sebagai resit_jualan.png');
             }
@@ -748,7 +770,6 @@
             console.error(err);
             alert('Gagal menjana imej. Sila cuba lagi.');
         } finally {
-            // Sembunyikan semula
             resitDiv.style.display = 'none';
             resitDiv.style.position = '';
             resitDiv.style.left = '';
