@@ -6,13 +6,13 @@
     <title>Aplikasi Jualan - Setup & Rekod (Harian + Stok)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
+        /* ... CSS yang sama seperti sebelumnya ... */
         * { box-sizing: border-box; }
         body { font-family: Arial, sans-serif; margin: 10px; background: #f0f2f5; }
         .container { max-width: 950px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); overflow-x: hidden; }
         h2, h3 { text-align: center; color: #2c3e50; margin-top: 0; }
         .page { display: none; }
         .page.active { display: block; }
-
         .btn { padding: 8px 12px; margin: 2px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 13px; }
         .btn-primary { background: #3498db; color: white; }
         .btn-success { background: #27ae60; color: white; }
@@ -22,7 +22,6 @@
         .btn-info { background: #17a2b8; color: white; }
         .btn-backup { background: #6f42c1; color: white; }
         .btn-share { background: #25D366; color: white; }
-
         .form-group { margin-bottom: 12px; display: flex; flex-wrap: wrap; align-items: center; }
         label { width: 150px; font-weight: bold; }
         input, select { padding: 8px; width: 250px; border: 1px solid #ccc; border-radius: 4px; }
@@ -30,26 +29,21 @@
         .checkbox-group { display: flex; align-items: center; gap: 0; margin-left: 150px; }
         .checkbox-group input[type="checkbox"] { width: auto; margin-right: 0; }
         .checkbox-group label { width: auto; font-weight: normal; font-size: 12px; margin-left: 1px; }
-
         table { width: 100%; border-collapse: collapse; margin-top: 15px; table-layout: auto; word-wrap: break-word; }
         th, td { border: 1px solid #ddd; padding: 6px 4px; text-align: center; font-size: 13px; }
         th { background: #f8f9fa; }
         td { word-break: break-word; }
         .total-row { font-weight: bold; background: #e9ecef; }
         .edit-input { width: 70px !important; padding: 4px; font-size: 13px; }
-
         .btn-group { margin: 15px 0; }
         .filter-section { background: #e9ecef; padding: 10px; border-radius: 5px; margin: 15px 0; }
         .filter-section label { width: auto; margin-right: 5px; }
         .filter-section input[type="date"] { width: 130px; }
-
         .ringkasan-harian { margin-top: 20px; border: 1px solid #000; padding: 10px; text-align: left; }
         .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 10px; }
         .backup-section { background: #f8f9fa; padding: 10px; margin: 15px 0; border-radius: 5px; text-align: center; }
         .nota-backup { font-size: 12px; color: #666; margin-top: 5px; }
-
         #resit-print { display: none; background: white; padding: 15px; max-width: 800px; margin: auto; }
-
         @media screen and (max-width: 600px) {
             .container { padding: 15px; }
             .form-group { flex-direction: column; align-items: flex-start; }
@@ -60,19 +54,8 @@
             th, td { font-size: 11px; padding: 4px 2px; }
             .filter-section input[type="date"] { width: 100%; }
             .btn-group { display: flex; flex-wrap: wrap; }
-            .checkbox-group {
-                margin-left: 0;
-                display: flex !important;
-                flex-direction: row !important;
-                align-items: center;
-                gap: 0;
-            }
-            .checkbox-group label {
-                width: auto !important;
-                margin-left: 1px;
-                font-size: 12px;
-                margin-bottom: 0;
-            }
+            .checkbox-group { margin-left: 0; display: flex !important; flex-direction: row !important; align-items: center; gap: 0; }
+            .checkbox-group label { width: auto !important; margin-left: 1px; font-size: 12px; margin-bottom: 0; }
         }
         @media print {
             body { background: white; margin: 0; }
@@ -245,10 +228,54 @@
     let namaSyarikat = ambilData('syarikat') || '';
     let rekodJualan = ambilData('jualan') || [];
 
+    // ========== FUNGSI MIGRASI DATA LAMA ==========
+    function migrasiData() {
+        let perluSimpan = false;
+        // Migrasi produk lama (tanpa jenis)
+        senaraiProduk = senaraiProduk.map(p => {
+            if (!p.jenis) {
+                perluSimpan = true;
+                return { ...p, jenis: 'harian', stok: 0 };
+            }
+            // Jika stok tiada, tambah default
+            if (p.jenis === 'stok' && p.stok === undefined) {
+                perluSimpan = true;
+                p.stok = 0;
+            }
+            if (p.jenis === 'harian' && p.stok === undefined) {
+                perluSimpan = true;
+                p.stok = 0;
+            }
+            return p;
+        });
+
+        // Migrasi rekod jualan lama (tidak perlu perubahan, tapi pastikan properti lengkap)
+        rekodJualan = rekodJualan.map(r => {
+            // Jika rekod tidak memiliki dihantar/tambahan (mungkin dari versi sangat lama), tambahkan
+            if (r.dihantar === undefined) {
+                perluSimpan = true;
+                r.dihantar = 0;
+            }
+            if (r.tambahan === undefined) {
+                perluSimpan = true;
+                r.tambahan = 0;
+            }
+            return r;
+        });
+
+        if (perluSimpan) {
+            simpanData('produk', senaraiProduk);
+            simpanData('jualan', rekodJualan);
+        }
+    }
+
     const pageSetup = document.getElementById('page-setup');
     const pageJualan = document.getElementById('page-jualan');
 
     window.onload = function() {
+        // Lakukan migrasi data lama terlebih dahulu
+        migrasiData();
+
         const t = new Date();
         document.getElementById('tarikh-jualan').valueAsDate = t;
         const tgl = new Date(t); tgl.setDate(t.getDate()-2);
@@ -424,7 +451,7 @@
         if (produk.jenis === 'harian') { document.getElementById('bil-dihantar').value = '0'; document.getElementById('bil-tambahan').value = '0'; }
     }
 
-    // ========== PAPAR REKOD (DIPERBAIKI) ==========
+    // ========== PAPAR REKOD ==========
     function paparSemuaRekod() {
         let htmlHarian = '';
         let htmlStok = '';
@@ -432,7 +459,6 @@
         let countStok = 0;
 
         rekodJualan.forEach((item, idxGlobal) => {
-            // Cari produk dengan perbandingan dinormalkan
             const produk = senaraiProduk.find(p => p.nama.trim().toLowerCase() === item.produk.trim().toLowerCase());
             if (!produk) {
                 console.warn('Produk tidak dijumpai untuk rekod:', item);
@@ -597,6 +623,8 @@
                         namaSyarikat = data.syarikat;
                         senaraiProduk = data.produk;
                         rekodJualan = data.jualan;
+                        // Migrasi data yang baru dipulihkan (sekiranya backup dari versi lama)
+                        migrasiData();
                         simpanData('syarikat', namaSyarikat);
                         simpanData('produk', senaraiProduk);
                         simpanData('jualan', rekodJualan);
