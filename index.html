@@ -3,37 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Aplikasi Jualan - Setup & Rekod</title>
+    <title>Aplikasi Jualan - Setup & Rekod (Harian + Stok)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         * { box-sizing: border-box; }
-        body {
-            font-family: Arial, sans-serif;
-            margin: 10px;
-            background: #f0f2f5;
-        }
-        .container {
-            max-width: 900px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            overflow-x: hidden;
-        }
-        h2 { text-align: center; color: #2c3e50; margin-top: 0; }
+        body { font-family: Arial, sans-serif; margin: 10px; background: #f0f2f5; }
+        .container { max-width: 950px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); overflow-x: hidden; }
+        h2, h3 { text-align: center; color: #2c3e50; margin-top: 0; }
         .page { display: none; }
         .page.active { display: block; }
 
-        .btn {
-            padding: 8px 12px;
-            margin: 2px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 13px;
-        }
+        .btn { padding: 8px 12px; margin: 2px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 13px; }
         .btn-primary { background: #3498db; color: white; }
         .btn-success { background: #27ae60; color: white; }
         .btn-warning { background: #f39c12; color: white; }
@@ -43,105 +23,35 @@
         .btn-backup { background: #6f42c1; color: white; }
         .btn-share { background: #25D366; color: white; }
 
-        .form-group {
-            margin-bottom: 12px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-        }
+        .form-group { margin-bottom: 12px; display: flex; flex-wrap: wrap; align-items: center; }
         label { width: 150px; font-weight: bold; }
-        input, select {
-            padding: 8px;
-            width: 250px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
+        input, select { padding: 8px; width: 250px; border: 1px solid #ccc; border-radius: 4px; }
         input[type="number"] { width: 120px; }
+        .checkbox-group { display: flex; align-items: center; gap: 0; margin-left: 150px; }
+        .checkbox-group input[type="checkbox"] { width: auto; margin-right: 0; }
+        .checkbox-group label { width: auto; font-weight: normal; font-size: 12px; margin-left: 1px; }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            table-layout: auto;
-            word-wrap: break-word;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 6px 4px;
-            text-align: center;
-            font-size: 13px;
-        }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; table-layout: auto; word-wrap: break-word; }
+        th, td { border: 1px solid #ddd; padding: 6px 4px; text-align: center; font-size: 13px; }
         th { background: #f8f9fa; }
         td { word-break: break-word; }
         .total-row { font-weight: bold; background: #e9ecef; }
-        .edit-input {
-            width: 70px !important;
-            padding: 4px;
-            font-size: 13px;
-        }
+        .edit-input { width: 70px !important; padding: 4px; font-size: 13px; }
 
         .btn-group { margin: 15px 0; }
-        .filter-section {
-            background: #e9ecef;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 15px 0;
-        }
+        .filter-section { background: #e9ecef; padding: 10px; border-radius: 5px; margin: 15px 0; }
         .filter-section label { width: auto; margin-right: 5px; }
         .filter-section input[type="date"] { width: 130px; }
 
-        .select-mode-bar {
-            display: none;
-            justify-content: space-between;
-            align-items: center;
-            background: #eaf2f8;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
-        .select-mode-bar.active { display: flex; }
-        .select-mode-bar span { font-weight: bold; }
-        .chk-produk { display: none; }
-        .chk-produk.show { display: inline-block; margin-right: 8px; }
+        .ringkasan-harian { margin-top: 20px; border: 1px solid #000; padding: 10px; text-align: left; }
+        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 10px; }
+        .backup-section { background: #f8f9fa; padding: 10px; margin: 15px 0; border-radius: 5px; text-align: center; }
+        .nota-backup { font-size: 12px; color: #666; margin-top: 5px; }
 
-        .ringkasan-harian {
-            margin-top: 20px;
-            border: 1px solid #000;
-            padding: 10px;
-            text-align: left;
-        }
-
-        .table-responsive {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            margin-top: 15px;
-        }
-
-        .backup-section {
-            background: #f8f9fa;
-            padding: 10px;
-            margin: 15px 0;
-            border-radius: 5px;
-            text-align: center;
-        }
-        .nota-backup {
-            font-size: 12px;
-            color: #666;
-            margin-top: 5px;
-        }
-
-        #resit-print {
-            display: none;
-            background: white;
-            padding: 15px;
-            max-width: 800px;
-            margin: auto;
-        }
+        #resit-print { display: none; background: white; padding: 15px; max-width: 800px; margin: auto; }
 
         @media screen and (max-width: 600px) {
-            body { margin: 5px; }
             .container { padding: 15px; }
-            h2 { font-size: 20px; }
             .form-group { flex-direction: column; align-items: flex-start; }
             label { width: 100%; margin-bottom: 3px; }
             input, select { width: 100% !important; }
@@ -150,21 +60,27 @@
             th, td { font-size: 11px; padding: 4px 2px; }
             .filter-section input[type="date"] { width: 100%; }
             .btn-group { display: flex; flex-wrap: wrap; }
-            .btn-group .btn { flex: 1 0 auto; }
+            .checkbox-group {
+                margin-left: 0;
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center;
+                gap: 0;
+            }
+            .checkbox-group label {
+                width: auto !important;
+                margin-left: 1px;
+                font-size: 12px;
+                margin-bottom: 0;
+            }
         }
-
         @media print {
             body { background: white; margin: 0; }
             .container { box-shadow: none; padding: 0; }
             .page.active { display: none; }
             #resit-print { display: block !important; }
             #resit-print table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-            #resit-print th, #resit-print td {
-                border: 1px solid #000;
-                padding: 5px;
-                font-size: 12px;
-                text-align: center;
-            }
+            #resit-print th, #resit-print td { border: 1px solid #000; padding: 5px; font-size: 12px; text-align: center; }
             #resit-print th { background: #ddd; }
             .header-kiri { float: left; font-weight: bold; font-size: 18px; }
             .header-kanan { float: right; font-size: 14px; }
@@ -176,7 +92,7 @@
 </head>
 <body>
 <div class="container">
-    <!-- Halaman Setup -->
+    <!-- HALAMAN SETUP -->
     <div id="page-setup" class="page active">
         <h2>⚙️ Setup Syarikat & Produk</h2>
         <div class="form-group">
@@ -184,7 +100,7 @@
             <input type="text" id="setup-nama-syarikat" placeholder="cth: Syarikat Maju Jaya">
         </div>
         <hr>
-        <h3>Senarai Produk & Harga</h3>
+        <h3>Tambah Produk Baru</h3>
         <div class="form-group">
             <label>Nama Produk:</label>
             <input type="text" id="setup-nama-produk" placeholder="cth: Biskut Coklat">
@@ -193,31 +109,26 @@
             <label>Harga (RM):</label>
             <input type="number" id="setup-harga" value="0.00" step="0.01" min="0">
         </div>
-        <button class="btn btn-success" onclick="tambahProduk()">+ Tambah Produk</button>
-
-        <div id="select-mode-bar" class="select-mode-bar">
-            <span id="bilangan-dipilih">0 dipilih</span>
-            <div>
-                <button class="btn btn-danger" onclick="padamProdukDipilih()">Padam Pilihan</button>
-                <button class="btn btn-secondary" onclick="tamatModPilih()">Batal</button>
+        <div class="form-group">
+            <label></label>
+            <div class="checkbox-group">
+                <input type="checkbox" id="setup-stok" onchange="toggleStokInput()">
+                <label for="setup-stok">Tandakan sekiranya produk ini menyimpan stok (cth: chiller/kering)</label>
             </div>
         </div>
+        <div class="form-group" id="stok-awal-group" style="display:none;">
+            <label>Stok Awal:</label>
+            <input type="number" id="setup-stok-awal" value="0" min="0">
+        </div>
+        <button class="btn btn-success" onclick="tambahProduk()">+ Tambah Produk</button>
 
-        <table id="jadual-produk">
-            <thead>
-                <tr>
-                    <th id="th-pilih" style="display:none;">Pilih</th>
-                    <th>Nama Produk</th>
-                    <th>Harga (RM)</th>
-                    <th>Tindakan</th>
-                </tr>
-            </thead>
-            <tbody id="isi-jadual-produk">
-                <tr><td colspan="4">Tiada produk. Sila tambah.</td></tr>
-            </tbody>
-        </table>
-
-        <button id="btn-pilih-produk" class="btn btn-warning" onclick="aktifkanModPilih()">🗂️ Pilih Produk</button>
+        <h3>📋 Senarai Produk</h3>
+        <div class="table-responsive">
+            <table id="jadual-produk">
+                <thead><tr><th>Nama</th><th>Harga (RM)</th><th>Jenis</th><th>Stok</th><th>Tindakan</th></tr></thead>
+                <tbody id="isi-jadual-produk"><tr><td colspan="5">Tiada produk.</td></tr></tbody>
+            </table>
+        </div>
 
         <div class="btn-group">
             <button class="btn btn-primary" onclick="simpanSetup()">💾 Simpan & Pergi ke Rekod Jualan</button>
@@ -231,7 +142,7 @@
         </div>
     </div>
 
-    <!-- Halaman Rekod Jualan -->
+    <!-- HALAMAN REKOD JUALAN -->
     <div id="page-jualan" class="page">
         <h2>📋 Rekod Jualan Harian</h2>
         <div class="form-group">
@@ -246,13 +157,24 @@
             <label>Harga (auto):</label>
             <input type="text" id="harga-produk-auto" readonly value="0.00">
         </div>
-        <div class="form-group">
-            <label>Bil. Dihantar:</label>
-            <input type="number" id="bil-dihantar" value="0" min="0">
+        <div id="harian-inputs">
+            <div class="form-group">
+                <label>Bil. Dihantar:</label>
+                <input type="number" id="bil-dihantar" value="0" min="0">
+            </div>
+            <div class="form-group">
+                <label>Bil. Tambahan:</label>
+                <input type="number" id="bil-tambahan" value="0" min="0">
+            </div>
         </div>
-        <div class="form-group">
-            <label>Bil. Tambahan:</label>
-            <input type="number" id="bil-tambahan" value="0" min="0">
+        <div id="stok-inputs" style="display:none;">
+            <div class="form-group">
+                <label>Stok Semasa:</label>
+                <input type="text" id="stok-semasa" readonly value="0">
+            </div>
+            <div class="form-group">
+                <button class="btn btn-warning" id="btn-tambah-stok" style="display:none;" onclick="tambahStok()">📥 Tambah Stok</button>
+            </div>
         </div>
         <div class="form-group">
             <label>Bil. Terjual:</label>
@@ -270,15 +192,19 @@
             <button class="btn btn-share" onclick="kongsiResit()">📤 Kongsi ke WhatsApp</button>
         </div>
 
-        <h3>📌 Rekod Tersimpan</h3>
+        <h3>📌 Rekod Produk Harian</h3>
         <div class="table-responsive">
-            <table id="senarai-jualan">
-                <thead>
-                    <tr>
-                        <th>No</th><th>Tarikh</th><th>Produk</th><th>Dihantar</th><th>Tambahan</th><th>Terjual</th><th>Harga (RM)</th><th>Jumlah (RM)</th><th>Tindakan</th>
-                    </tr>
-                </thead>
-                <tbody id="isi-senarai-jualan"></tbody>
+            <table id="senarai-harian">
+                <thead><tr><th>No</th><th>Tarikh</th><th>Produk</th><th>Dihantar</th><th>Tambahan</th><th>Terjual</th><th>Harga (RM)</th><th>Jumlah (RM)</th><th>Tindakan</th></tr></thead>
+                <tbody id="isi-senarai-harian"><tr><td colspan="9">Tiada rekod.</td></tr></tbody>
+            </table>
+        </div>
+
+        <h3>📦 Rekod Produk Stok</h3>
+        <div class="table-responsive">
+            <table id="senarai-stok">
+                <thead><tr><th>No</th><th>Tarikh</th><th>Produk</th><th>Terjual</th><th>Harga (RM)</th><th>Jumlah (RM)</th><th>Tindakan</th></tr></thead>
+                <tbody id="isi-senarai-stok"><tr><td colspan="7">Tiada rekod.</td></tr></tbody>
             </table>
         </div>
 
@@ -287,12 +213,12 @@
         <div class="backup-section">
             <button class="btn btn-backup" onclick="backupData()">💾 Backup Data</button>
             <button class="btn btn-info" onclick="restoreData()">📂 Pulihkan Backup</button>
-            <div class="nota-backup">💡 <strong>Tips:</strong> Selepas backup, kongsi fail ke WhatsApp supaya anda tidak kehilangan data.</div>
+            <div class="nota-backup">💡 Tips: Selepas backup, kongsi fail ke WhatsApp supaya anda tidak kehilangan data.</div>
         </div>
     </div>
 </div>
 
-<!-- Resit untuk cetakan / kongsi -->
+<!-- RESIT -->
 <div id="resit-print">
     <div class="clearfix">
         <div class="header-kiri" id="cetak-nama-syarikat"></div>
@@ -305,160 +231,93 @@
     </table>
     <div class="ringkasan-harian" id="ringkasan-harian"></div>
     <table style="margin-top:0;">
-        <tfoot>
-            <tr class="total-row">
-                <td colspan="7" style="text-align:right;">Jumlah Keseluruhan:</td>
-                <td id="cetak-jumlah-besar"></td>
-            </tr>
-        </tfoot>
+        <tfoot><tr class="total-row"><td colspan="7" style="text-align:right;">Jumlah Keseluruhan:</td><td id="cetak-jumlah-besar"></td></tr></tfoot>
     </table>
 </div>
 
 <script>
-    // Format tarikh
-    function formatTarikh(tarikhStr) {
-        if (!tarikhStr) return '';
-        const [tahun, bulan, hari] = tarikhStr.split('-');
-        return `${hari}/${bulan}/${tahun}`;
-    }
-
-    // Data dan localStorage
-    function simpanData(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
-    function ambilData(key) { const data = localStorage.getItem(key); return data ? JSON.parse(data) : null; }
+    // ========== DATA & STORAGE ==========
+    function formatTarikh(t) { if(!t)return''; const [y,m,d]=t.split('-'); return `${d}/${m}/${y}`; }
+    function simpanData(k,v) { localStorage.setItem(k,JSON.stringify(v)); }
+    function ambilData(k) { const d=localStorage.getItem(k); return d?JSON.parse(d):null; }
 
     let senaraiProduk = ambilData('produk') || [];
     let namaSyarikat = ambilData('syarikat') || '';
     let rekodJualan = ambilData('jualan') || [];
-    let modPilih = false;
 
     const pageSetup = document.getElementById('page-setup');
     const pageJualan = document.getElementById('page-jualan');
 
     window.onload = function() {
-        const hariIni = new Date();
-        document.getElementById('tarikh-jualan').valueAsDate = hariIni;
-        const tigaHariLepas = new Date(hariIni);
-        tigaHariLepas.setDate(hariIni.getDate() - 2);
-        document.getElementById('dari-tarikh').valueAsDate = tigaHariLepas;
-        document.getElementById('hingga-tarikh').valueAsDate = hariIni;
-
+        const t = new Date();
+        document.getElementById('tarikh-jualan').valueAsDate = t;
+        const tgl = new Date(t); tgl.setDate(t.getDate()-2);
+        document.getElementById('dari-tarikh').valueAsDate = tgl;
+        document.getElementById('hingga-tarikh').valueAsDate = t;
         if (namaSyarikat) document.getElementById('setup-nama-syarikat').value = namaSyarikat;
         paparJadualProduk();
         isiDropdownProduk();
-
-        if (namaSyarikat && senaraiProduk.length > 0) {
-            pageSetup.classList.remove('active');
-            pageJualan.classList.add('active');
-        } else {
-            pageSetup.classList.add('active');
-            pageJualan.classList.remove('active');
-        }
-        paparSenaraiJualan();
+        if (namaSyarikat && senaraiProduk.length>0) { pageSetup.classList.remove('active'); pageJualan.classList.add('active'); }
+        else { pageSetup.classList.add('active'); pageJualan.classList.remove('active'); }
+        paparSemuaRekod();
     };
+
+    function toggleStokInput() {
+        document.getElementById('stok-awal-group').style.display = document.getElementById('setup-stok').checked ? 'flex' : 'none';
+    }
 
     // ========== SETUP PRODUK ==========
     function tambahProduk() {
         const nama = document.getElementById('setup-nama-produk').value.trim();
         const harga = parseFloat(document.getElementById('setup-harga').value);
-        if (!nama || isNaN(harga) || harga <= 0) {
-            alert('Isi nama produk dan harga yang sah (harga > 0).');
-            return;
+        const isStok = document.getElementById('setup-stok').checked;
+        const stokAwal = isStok ? (parseInt(document.getElementById('setup-stok-awal').value) || 0) : 0;
+        if (!nama || isNaN(harga) || harga <= 0) { alert('Isi nama dan harga yang sah.'); return; }
+        if (senaraiProduk.some(p => p.nama.toLowerCase() === nama.toLowerCase())) { alert('Produk sudah ada.'); return; }
+        if (isStok && stokAwal < 0) { alert('Stok awal tidak boleh negatif.'); return; }
+
+        const produkBaru = {
+            nama,
+            harga,
+            jenis: isStok ? 'stok' : 'harian',
+            stok: isStok ? stokAwal : 0
+        };
+        if (isStok) {
+            produkBaru.tarikhStokMula = new Date().toISOString().slice(0,10);
         }
-        if (senaraiProduk.some(p => p.nama.toLowerCase() === nama.toLowerCase())) {
-            alert('Produk ini sudah ada.');
-            return;
-        }
-        senaraiProduk.push({ nama, harga });
+        senaraiProduk.push(produkBaru);
         simpanData('produk', senaraiProduk);
         paparJadualProduk();
         document.getElementById('setup-nama-produk').value = '';
         document.getElementById('setup-harga').value = '0.00';
+        document.getElementById('setup-stok').checked = false;
+        document.getElementById('setup-stok-awal').value = '0';
+        document.getElementById('stok-awal-group').style.display = 'none';
     }
 
     function paparJadualProduk() {
         const tbody = document.getElementById('isi-jadual-produk');
-        const thPilih = document.getElementById('th-pilih');
-        const barPilih = document.getElementById('select-mode-bar');
-        const btnPilih = document.getElementById('btn-pilih-produk');
-
-        if (senaraiProduk.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4">Tiada produk. Sila tambah.</td></tr>';
-            thPilih.style.display = 'none';
-            barPilih.classList.remove('active');
-            btnPilih.style.display = 'none';
-            modPilih = false;
-            return;
-        }
-
-        thPilih.style.display = modPilih ? '' : 'none';
-        barPilih.classList.toggle('active', modPilih);
-        btnPilih.style.display = modPilih ? 'none' : 'inline-block';
-
-        tbody.innerHTML = '';
-        senaraiProduk.forEach((produk, index) => {
-            const tr = document.createElement('tr');
-            const tdPilih = document.createElement('td');
-            tdPilih.style.display = modPilih ? '' : 'none';
-            const chk = document.createElement('input');
-            chk.type = 'checkbox';
-            chk.className = 'chk-produk show';
-            chk.dataset.index = index;
-            chk.addEventListener('change', kemaskiniBilanganDipilih);
-            tdPilih.appendChild(chk);
-            tr.appendChild(tdPilih);
-
-            const tdNama = document.createElement('td');
-            tdNama.textContent = produk.nama;
-            tr.appendChild(tdNama);
-
-            const tdHarga = document.createElement('td');
-            tdHarga.textContent = produk.harga.toFixed(2);
-            tr.appendChild(tdHarga);
-
-            const tdTindakan = document.createElement('td');
-            if (!modPilih) {
-                const btnPadam = document.createElement('button');
-                btnPadam.className = 'btn btn-danger';
-                btnPadam.textContent = 'Padam';
-                btnPadam.onclick = () => padamProduk(index);
-                tdTindakan.appendChild(btnPadam);
-            }
-            tr.appendChild(tdTindakan);
-            tbody.appendChild(tr);
-        });
-        kemaskiniBilanganDipilih();
+        if (senaraiProduk.length === 0) { tbody.innerHTML = '<tr><td colspan="5">Tiada produk.</td></tr>'; return; }
+        tbody.innerHTML = senaraiProduk.map((p, idx) => `<tr>
+            <td>${p.nama}</td><td>${p.harga.toFixed(2)}</td><td>${p.jenis === 'stok' ? 'Stok' : 'Harian'}</td>
+            <td>${p.jenis === 'stok' ? p.stok : '-'}</td>
+            <td>${p.jenis === 'stok' ? `<button class="btn btn-warning" onclick="tambahStokProduk(${idx})">+ Stok</button> ` : ''}
+            <button class="btn btn-danger" onclick="padamProduk(${idx})">Padam</button></td></tr>`).join('');
     }
 
-    function aktifkanModPilih() { modPilih = true; paparJadualProduk(); }
-    function tamatModPilih() { modPilih = false; paparJadualProduk(); }
-
-    function kemaskiniBilanganDipilih() {
-        const semua = document.querySelectorAll('#isi-jadual-produk input[type="checkbox"]');
-        const dipilih = Array.from(semua).filter(chk => chk.checked).length;
-        document.getElementById('bilangan-dipilih').textContent = dipilih + ' dipilih';
-    }
-
-    function padamProdukDipilih() {
-        const semua = document.querySelectorAll('#isi-jadual-produk input[type="checkbox"]');
-        const indeksUntukPadam = [];
-        semua.forEach((chk, idx) => { if (chk.checked) indeksUntukPadam.push(idx); });
-        if (indeksUntukPadam.length === 0) { alert('Tiada produk dipilih.'); return; }
-        if (!confirm('Padam ' + indeksUntukPadam.length + ' produk?')) return;
-        indeksUntukPadam.sort((a,b) => b - a);
-        indeksUntukPadam.forEach(i => senaraiProduk.splice(i, 1));
+    function tambahStokProduk(index) {
+        const tambahan = prompt('Masukkan jumlah stok tambahan:');
+        if (tambahan === null) return;
+        const jumlah = parseInt(tambahan);
+        if (isNaN(jumlah) || jumlah <= 0) { alert('Jumlah tidak sah.'); return; }
+        senaraiProduk[index].stok += jumlah;
         simpanData('produk', senaraiProduk);
-        modPilih = false;
         paparJadualProduk();
         isiDropdownProduk();
     }
 
     function padamProduk(index) {
-        if (confirm('Padam produk ini?')) {
-            senaraiProduk.splice(index, 1);
-            simpanData('produk', senaraiProduk);
-            paparJadualProduk();
-            isiDropdownProduk();
-        }
+        if (confirm('Padam produk ini?')) { senaraiProduk.splice(index, 1); simpanData('produk', senaraiProduk); paparJadualProduk(); isiDropdownProduk(); }
     }
 
     function simpanSetup() {
@@ -478,253 +337,300 @@
         document.getElementById('setup-nama-syarikat').value = namaSyarikat;
     }
 
-    // ========== REKOD JUALAN ==========
+    // ========== DROPDOWN & UI REKOD ==========
     function isiDropdownProduk() {
         const select = document.getElementById('pilih-produk');
         select.innerHTML = '<option value="">-- Pilih Produk --</option>';
-        senaraiProduk.forEach((produk, index) => {
-            select.innerHTML += `<option value="${index}">${produk.nama}</option>`;
-        });
+        senaraiProduk.forEach((p, idx) => select.innerHTML += `<option value="${idx}">${p.nama} (${p.jenis==='stok'?'Stok':'Harian'})</option>`);
+        resetInputs();
+    }
+
+    function resetInputs() {
+        document.getElementById('bil-dihantar').value = '0';
+        document.getElementById('bil-tambahan').value = '0';
+        document.getElementById('bil-terjual').value = '0';
+        document.getElementById('harian-inputs').style.display = 'block';
+        document.getElementById('stok-inputs').style.display = 'none';
+        document.getElementById('btn-tambah-stok').style.display = 'none';
         document.getElementById('harga-produk-auto').value = '0.00';
     }
 
     document.getElementById('pilih-produk').addEventListener('change', function() {
-        const index = this.value;
-        if (index === '') { document.getElementById('harga-produk-auto').value = '0.00'; return; }
-        const produk = senaraiProduk[parseInt(index)];
+        const idx = this.value;
+        const harianDiv = document.getElementById('harian-inputs');
+        const stokDiv = document.getElementById('stok-inputs');
+        const btnTambahStok = document.getElementById('btn-tambah-stok');
+        if (idx === '') { resetInputs(); return; }
+        const produk = senaraiProduk[parseInt(idx)];
         document.getElementById('harga-produk-auto').value = produk.harga.toFixed(2);
-    });
-
-    function tambahItem() {
-        const tarikh = document.getElementById('tarikh-jualan').value;
-        const indeksProduk = document.getElementById('pilih-produk').value;
-        if (!tarikh || indeksProduk === '') { alert('Pilih tarikh dan produk.'); return; }
-        const produk = senaraiProduk[parseInt(indeksProduk)];
-
-        if (rekodJualan.some(item => item.tarikh === tarikh && item.produk === produk.nama)) {
-            alert(`Produk "${produk.nama}" sudah direkodkan pada tarikh ${formatTarikh(tarikh)}.`);
-            return;
+        if (produk.jenis === 'stok') {
+            harianDiv.style.display = 'none';
+            stokDiv.style.display = 'block';
+            document.getElementById('stok-semasa').value = produk.stok;
+            btnTambahStok.style.display = 'inline-block';
+        } else {
+            harianDiv.style.display = 'block';
+            stokDiv.style.display = 'none';
+            btnTambahStok.style.display = 'none';
         }
-
-        const dihantar = parseInt(document.getElementById('bil-dihantar').value);
-        const tambahan = parseInt(document.getElementById('bil-tambahan').value);
-        const terjual = parseInt(document.getElementById('bil-terjual').value);
-
-        if (isNaN(dihantar) || dihantar < 0 || isNaN(tambahan) || tambahan < 0 || isNaN(terjual) || terjual < 0) {
-            alert('Semua bilangan mesti nombor positif.');
-            return;
-        }
-        if ((dihantar + tambahan) < terjual) {
-            alert('Dihantar + Tambahan tidak boleh kurang daripada Terjual.');
-            return;
-        }
-
-        const jumlah = terjual * produk.harga;
-        rekodJualan.push({ tarikh, produk: produk.nama, dihantar, tambahan, terjual, harga: produk.harga, jumlah });
-        simpanData('jualan', rekodJualan);
-        paparSenaraiJualan();
         document.getElementById('bil-dihantar').value = '0';
         document.getElementById('bil-tambahan').value = '0';
+    });
+
+    function tambahStok() {
+        const idx = document.getElementById('pilih-produk').value;
+        if (idx === '') return;
+        const produk = senaraiProduk[parseInt(idx)];
+        const tambahan = prompt(`Tambah stok untuk ${produk.nama}. Stok semasa: ${produk.stok}. Masukkan jumlah:`, '0');
+        if (tambahan === null) return;
+        const jumlah = parseInt(tambahan);
+        if (isNaN(jumlah) || jumlah <= 0) { alert('Jumlah tidak sah.'); return; }
+        produk.stok += jumlah;
+        simpanData('produk', senaraiProduk);
+        document.getElementById('stok-semasa').value = produk.stok;
+        alert(`Stok ${produk.nama} kini: ${produk.stok}`);
+    }
+
+    // ========== TAMBAH REKOD JUALAN ==========
+    function tambahItem() {
+        const tarikh = document.getElementById('tarikh-jualan').value;
+        const idx = document.getElementById('pilih-produk').value;
+        if (!tarikh || idx === '') { alert('Pilih tarikh dan produk.'); return; }
+        const produk = senaraiProduk[parseInt(idx)];
+        const terjual = parseInt(document.getElementById('bil-terjual').value);
+        if (isNaN(terjual) || terjual < 0) { alert('Bilangan terjual tidak sah.'); return; }
+        if (terjual === 0) { alert('Bilangan terjual mesti lebih daripada 0.'); return; }
+
+        if (produk.jenis === 'stok') {
+            if (produk.tarikhStokMula && tarikh < produk.tarikhStokMula) {
+                alert(`Tidak boleh merekod jualan sebelum tarikh stok mula (${formatTarikh(produk.tarikhStokMula)}).`);
+                return;
+            }
+            if (terjual > produk.stok) { alert(`Stok tidak mencukupi! Stok semasa: ${produk.stok}`); return; }
+            produk.stok -= terjual;
+            simpanData('produk', senaraiProduk);
+            document.getElementById('stok-semasa').value = produk.stok;
+            rekodJualan.push({ tarikh, produk: produk.nama, dihantar: 0, tambahan: 0, terjual, harga: produk.harga, jumlah: terjual * produk.harga });
+        } else {
+            const dihantar = parseInt(document.getElementById('bil-dihantar').value) || 0;
+            const tambahan = parseInt(document.getElementById('bil-tambahan').value) || 0;
+            if (isNaN(dihantar) || dihantar < 0 || isNaN(tambahan) || tambahan < 0) { alert('Bilangan tidak sah.'); return; }
+            if ((dihantar + tambahan) < terjual) { alert('Dihantar + Tambahan kurang daripada Terjual.'); return; }
+            rekodJualan.push({ tarikh, produk: produk.nama, dihantar, tambahan, terjual, harga: produk.harga, jumlah: terjual * produk.harga });
+        }
+        simpanData('jualan', rekodJualan);
+        paparSemuaRekod();
         document.getElementById('bil-terjual').value = '0';
+        if (produk.jenis === 'harian') { document.getElementById('bil-dihantar').value = '0'; document.getElementById('bil-tambahan').value = '0'; }
     }
 
-    // ========== EDIT REKOD (INLINE) ==========
+    // ========== PAPAR REKOD (DIPERBAIKI) ==========
+    function paparSemuaRekod() {
+        let htmlHarian = '';
+        let htmlStok = '';
+        let countHarian = 0;
+        let countStok = 0;
+
+        rekodJualan.forEach((item, idxGlobal) => {
+            // Cari produk dengan perbandingan dinormalkan
+            const produk = senaraiProduk.find(p => p.nama.trim().toLowerCase() === item.produk.trim().toLowerCase());
+            if (!produk) {
+                console.warn('Produk tidak dijumpai untuk rekod:', item);
+                return;
+            }
+            if (produk.jenis === 'harian') {
+                countHarian++;
+                htmlHarian += `<tr>
+                    <td>${countHarian}</td>
+                    <td>${formatTarikh(item.tarikh)}</td>
+                    <td>${item.produk}</td>
+                    <td>${item.dihantar}</td>
+                    <td>${item.tambahan}</td>
+                    <td>${item.terjual}</td>
+                    <td>${item.harga.toFixed(2)}</td>
+                    <td>${item.jumlah.toFixed(2)}</td>
+                    <td>
+                        <button class="btn btn-info" onclick="editRekod(${idxGlobal})">✎</button>
+                        <button class="btn btn-danger" onclick="padamRekod(${idxGlobal})">✖</button>
+                    </td>
+                </tr>`;
+            } else if (produk.jenis === 'stok') {
+                countStok++;
+                htmlStok += `<tr>
+                    <td>${countStok}</td>
+                    <td>${formatTarikh(item.tarikh)}</td>
+                    <td>${item.produk}</td>
+                    <td>${item.terjual}</td>
+                    <td>${item.harga.toFixed(2)}</td>
+                    <td>${item.jumlah.toFixed(2)}</td>
+                    <td>
+                        <button class="btn btn-info" onclick="editRekod(${idxGlobal})">✎</button>
+                        <button class="btn btn-danger" onclick="padamRekod(${idxGlobal})">✖</button>
+                    </td>
+                </tr>`;
+            }
+        });
+
+        document.getElementById('isi-senarai-harian').innerHTML = countHarian ? htmlHarian : '<tr><td colspan="9">Tiada rekod.</td></tr>';
+        document.getElementById('isi-senarai-stok').innerHTML = countStok ? htmlStok : '<tr><td colspan="7">Tiada rekod.</td></tr>';
+    }
+
+    // ========== EDIT & PADAM ==========
     function editRekod(index) {
-        const tbody = document.getElementById('isi-senarai-jualan');
         const rekod = rekodJualan[index];
-        // Gantikan baris dengan form
-        const tr = tbody.children[index];
-        tr.innerHTML = `
-            <td>${index+1}</td>
-            <td>${formatTarikh(rekod.tarikh)}</td>
-            <td>${rekod.produk}</td>
-            <td><input type="number" class="edit-input" id="edit-dihantar-${index}" value="${rekod.dihantar}" min="0"></td>
-            <td><input type="number" class="edit-input" id="edit-tambahan-${index}" value="${rekod.tambahan}" min="0"></td>
-            <td><input type="number" class="edit-input" id="edit-terjual-${index}" value="${rekod.terjual}" min="0"></td>
-            <td>${rekod.harga.toFixed(2)}</td>
-            <td id="edit-jumlah-${index}">${rekod.jumlah.toFixed(2)}</td>
-            <td>
-                <button class="btn btn-success" onclick="simpanEdit(${index})">✔</button>
-                <button class="btn btn-secondary" onclick="batalEdit(${index})">✖</button>
-            </td>
-        `;
-        // Auto kemaskini jumlah bila input berubah (optional)
-        document.getElementById(`edit-dihantar-${index}`).addEventListener('input', () => kiraEdit(index));
-        document.getElementById(`edit-tambahan-${index}`).addEventListener('input', () => kiraEdit(index));
-        document.getElementById(`edit-terjual-${index}`).addEventListener('input', () => kiraEdit(index));
-    }
-
-    function kiraEdit(index) {
-        const dihantar = parseInt(document.getElementById(`edit-dihantar-${index}`).value) || 0;
-        const tambahan = parseInt(document.getElementById(`edit-tambahan-${index}`).value) || 0;
-        const terjual = parseInt(document.getElementById(`edit-terjual-${index}`).value) || 0;
-        const jumlah = terjual * rekodJualan[index].harga;
-        document.getElementById(`edit-jumlah-${index}`).textContent = jumlah.toFixed(2);
+        const produk = senaraiProduk.find(p => p.nama.trim().toLowerCase() === rekod.produk.trim().toLowerCase());
+        if (!produk) { alert('Produk tidak dijumpai.'); return; }
+        if (produk.jenis === 'harian') {
+            const rekodHarian = [];
+            rekodJualan.forEach((r, i) => { if (senaraiProduk.find(p=>p.nama.trim().toLowerCase()===r.produk.trim().toLowerCase())?.jenis==='harian') rekodHarian.push({...r, _i: i}); });
+            const localIndex = rekodHarian.findIndex(r => r._i === index);
+            const tbody = document.getElementById('isi-senarai-harian');
+            const tr = tbody.children[localIndex];
+            tr.innerHTML = `<td>${localIndex+1}</td><td>${formatTarikh(rekod.tarikh)}</td><td>${rekod.produk}</td>
+                <td><input type="number" class="edit-input" id="edit-dih-${index}" value="${rekod.dihantar}" min="0"></td>
+                <td><input type="number" class="edit-input" id="edit-tam-${index}" value="${rekod.tambahan}" min="0"></td>
+                <td><input type="number" class="edit-input" id="edit-ter-${index}" value="${rekod.terjual}" min="0"></td>
+                <td>${rekod.harga.toFixed(2)}</td><td id="edit-jum-${index}">${rekod.jumlah.toFixed(2)}</td>
+                <td><button class="btn btn-success" onclick="simpanEdit(${index})">✔</button>
+                <button class="btn btn-secondary" onclick="paparSemuaRekod()">✖</button></td>`;
+            const update = () => {
+                const d = parseInt(document.getElementById(`edit-dih-${index}`).value)||0;
+                const tb = parseInt(document.getElementById(`edit-tam-${index}`).value)||0;
+                const t = parseInt(document.getElementById(`edit-ter-${index}`).value)||0;
+                document.getElementById(`edit-jum-${index}`).textContent = (t * rekod.harga).toFixed(2);
+            };
+            document.getElementById(`edit-dih-${index}`).addEventListener('input', update);
+            document.getElementById(`edit-tam-${index}`).addEventListener('input', update);
+            document.getElementById(`edit-ter-${index}`).addEventListener('input', update);
+        } else {
+            const rekodStok = [];
+            rekodJualan.forEach((r, i) => { if (senaraiProduk.find(p=>p.nama.trim().toLowerCase()===r.produk.trim().toLowerCase())?.jenis==='stok') rekodStok.push({...r, _i: i}); });
+            const localIndex = rekodStok.findIndex(r => r._i === index);
+            const tbody = document.getElementById('isi-senarai-stok');
+            const tr = tbody.children[localIndex];
+            tr.innerHTML = `<td>${localIndex+1}</td><td>${formatTarikh(rekod.tarikh)}</td><td>${rekod.produk}</td>
+                <td><input type="number" class="edit-input" id="edit-ter-${index}" value="${rekod.terjual}" min="0"></td>
+                <td>${rekod.harga.toFixed(2)}</td><td id="edit-jum-${index}">${rekod.jumlah.toFixed(2)}</td>
+                <td><button class="btn btn-success" onclick="simpanEdit(${index})">✔</button>
+                <button class="btn btn-secondary" onclick="paparSemuaRekod()">✖</button></td>`;
+            document.getElementById(`edit-ter-${index}`).addEventListener('input', function() {
+                const t = parseInt(this.value) || 0;
+                document.getElementById(`edit-jum-${index}`).textContent = (t * rekod.harga).toFixed(2);
+            });
+        }
     }
 
     function simpanEdit(index) {
-        const dihantar = parseInt(document.getElementById(`edit-dihantar-${index}`).value);
-        const tambahan = parseInt(document.getElementById(`edit-tambahan-${index}`).value);
-        const terjual = parseInt(document.getElementById(`edit-terjual-${index}`).value);
-
-        if (isNaN(dihantar) || dihantar < 0 || isNaN(tambahan) || tambahan < 0 || isNaN(terjual) || terjual < 0) {
-            alert('Semua bilangan mesti nombor positif.');
-            return;
-        }
-        if ((dihantar + tambahan) < terjual) {
-            alert('Dihantar + Tambahan tidak boleh kurang daripada Terjual.');
-            return;
-        }
-
         const rekod = rekodJualan[index];
-        rekod.dihantar = dihantar;
-        rekod.tambahan = tambahan;
-        rekod.terjual = terjual;
-        rekod.jumlah = terjual * rekod.harga;
-        simpanData('jualan', rekodJualan);
-        paparSenaraiJualan();
-    }
-
-    function batalEdit(index) {
-        // Hanya refresh paparan seperti asal
-        paparSenaraiJualan();
-    }
-
-    function paparSenaraiJualan() {
-        const tbody = document.getElementById('isi-senarai-jualan');
-        if (rekodJualan.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="9">Tiada rekod jualan.</td></tr>';
-            return;
+        const produk = senaraiProduk.find(p => p.nama.trim().toLowerCase() === rekod.produk.trim().toLowerCase());
+        if (!produk) return;
+        if (produk.jenis === 'stok') {
+            const terjualBaru = parseInt(document.getElementById(`edit-ter-${index}`).value);
+            if (isNaN(terjualBaru) || terjualBaru < 0) { alert('Bilangan tidak sah.'); return; }
+            const perubahan = terjualBaru - rekod.terjual;
+            if (perubahan > 0 && perubahan > produk.stok) {
+                alert(`Stok tidak mencukupi untuk tambahan jualan. Stok semasa: ${produk.stok}`);
+                return;
+            }
+            produk.stok += rekod.terjual;
+            produk.stok -= terjualBaru;
+            rekod.terjual = terjualBaru;
+            rekod.jumlah = terjualBaru * rekod.harga;
+            simpanData('produk', senaraiProduk);
+        } else {
+            const d = parseInt(document.getElementById(`edit-dih-${index}`).value)||0;
+            const tb = parseInt(document.getElementById(`edit-tam-${index}`).value)||0;
+            const t = parseInt(document.getElementById(`edit-ter-${index}`).value)||0;
+            if (isNaN(d)||d<0||isNaN(tb)||tb<0||isNaN(t)||t<0) { alert('Bilangan tidak sah.'); return; }
+            if ((d+tb) < t) { alert('Dihantar + Tambahan kurang daripada Terjual.'); return; }
+            rekod.dihantar = d; rekod.tambahan = tb; rekod.terjual = t; rekod.jumlah = t * rekod.harga;
         }
-        tbody.innerHTML = '';
-        rekodJualan.forEach((item, index) => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${index+1}</td>
-                <td>${formatTarikh(item.tarikh)}</td>
-                <td>${item.produk}</td>
-                <td>${item.dihantar}</td>
-                <td>${item.tambahan}</td>
-                <td>${item.terjual}</td>
-                <td>${item.harga.toFixed(2)}</td>
-                <td>${item.jumlah.toFixed(2)}</td>
-                <td>
-                    <button class="btn btn-info" onclick="editRekod(${index})">✎</button>
-                    <button class="btn btn-danger" onclick="padamRekod(${index})">✖</button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
+        simpanData('jualan', rekodJualan);
+        paparSemuaRekod();
     }
 
     function padamRekod(index) {
-        if (confirm('Padam rekod ini?')) {
-            rekodJualan.splice(index, 1);
-            simpanData('jualan', rekodJualan);
-            paparSenaraiJualan();
+        if (!confirm('Padam rekod ini?')) return;
+        const rekod = rekodJualan[index];
+        const produk = senaraiProduk.find(p => p.nama.trim().toLowerCase() === rekod.produk.trim().toLowerCase());
+        if (produk && produk.jenis === 'stok') {
+            produk.stok += rekod.terjual;
+            simpanData('produk', senaraiProduk);
         }
+        rekodJualan.splice(index, 1);
+        simpanData('jualan', rekodJualan);
+        paparSemuaRekod();
     }
 
     // ========== BACKUP & RESTORE ==========
     function backupData() {
         const data = { syarikat: namaSyarikat, produk: senaraiProduk, jualan: rekodJualan };
-        const jsonStr = JSON.stringify(data, null, 2);
-        const blob = new Blob([jsonStr], {type: 'application/json'});
+        const json = JSON.stringify(data, null, 2);
+        const blob = new Blob([json], {type:'application/json'});
         const url = URL.createObjectURL(blob);
         const timestamp = new Date().toISOString().slice(0,10);
         const namaFail = `jualan_backup_${timestamp}.json`;
-
         if (navigator.share && navigator.canShare) {
-            const fail = new File([blob], namaFail, { type: 'application/json' });
-            if (navigator.canShare({ files: [fail] })) {
-                navigator.share({ files: [fail], title: 'Backup Data Jualan', text: 'Simpan fail ini untuk backup data jualan anda.' })
-                .then(() => alert('Backup berjaya dikongsi!'))
-                .catch(() => muatTurunBackup(url, namaFail));
+            const fail = new File([blob], namaFail, {type:'application/json'});
+            if (navigator.canShare({files:[fail]})) {
+                navigator.share({files:[fail], title:'Backup Data Jualan', text:'Simpan fail ini untuk backup.'}).then(() => alert('Backup dikongsi!')).catch(() => muatTurun(url, namaFail));
                 return;
             }
         }
-        muatTurunBackup(url, namaFail);
+        muatTurun(url, namaFail);
     }
-
-    function muatTurunBackup(url, namaFail) {
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = namaFail;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+    function muatTurun(url, nama) {
+        const a = document.createElement('a'); a.href=url; a.download=nama;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        alert(`Backup berjaya dimuat turun!\nNama fail: ${namaFail}\nSemak folder Downloads.`);
+        alert(`Backup dimuat turun: ${nama}`);
     }
-
-    function restoreData() {
-        document.getElementById('file-restore').click();
-    }
-
+    function restoreData() { document.getElementById('file-restore').click(); }
     function prosesRestore(input) {
-        const file = input.files[0];
-        if (!file) return;
+        const file = input.files[0]; if(!file) return;
         const reader = new FileReader();
         reader.onload = function(e) {
             try {
                 const data = JSON.parse(e.target.result);
                 if (data.syarikat && data.produk && data.jualan) {
-                    if (confirm('Ini akan menggantikan semua data sedia ada. Teruskan?')) {
+                    if (confirm('Ganti semua data?')) {
                         namaSyarikat = data.syarikat;
                         senaraiProduk = data.produk;
                         rekodJualan = data.jualan;
                         simpanData('syarikat', namaSyarikat);
                         simpanData('produk', senaraiProduk);
                         simpanData('jualan', rekodJualan);
-                        alert('Data berjaya dipulihkan!');
+                        alert('Data dipulihkan!');
                         paparJadualProduk();
                         isiDropdownProduk();
-                        paparSenaraiJualan();
+                        paparSemuaRekod();
                         document.getElementById('setup-nama-syarikat').value = namaSyarikat;
                     }
-                } else {
-                    alert('Fail backup tidak sah.');
-                }
-            } catch (err) {
-                alert('Fail tidak boleh dibaca.');
-            }
+                } else alert('Fail tidak sah.');
+            } catch (err) { alert('Fail rosak.'); }
         };
         reader.readAsText(file);
     }
 
-    // ========== SEDIAKAN RESIT ==========
+    // ========== RESIT & CETAK ==========
     function sediakanResit() {
         const dari = document.getElementById('dari-tarikh').value;
         const hingga = document.getElementById('hingga-tarikh').value;
-        if (!dari || !hingga) { alert('Pilih tarikh mula dan tamat.'); return null; }
+        if (!dari || !hingga) { alert('Pilih tarikh.'); return false; }
         const mula = new Date(dari + 'T00:00:00');
         const tamat = new Date(hingga + 'T23:59:59');
-        const rekodTapis = rekodJualan.filter(item => {
-            const t = new Date(item.tarikh + 'T00:00:00');
-            return t >= mula && t <= tamat;
-        });
-        if (rekodTapis.length === 0) { alert('Tiada rekod dalam tempoh ini.'); return null; }
-
+        const tapis = rekodJualan.filter(item => { const t = new Date(item.tarikh + 'T00:00:00'); return t >= mula && t <= tamat; });
+        if (tapis.length === 0) { alert('Tiada rekod.'); return false; }
         document.getElementById('cetak-nama-syarikat').innerText = namaSyarikat;
-        const sekarang = new Date();
-        document.getElementById('cetak-tarikh').innerText = 'Tarikh: ' + sekarang.toLocaleDateString('ms-MY', { day: '2-digit', month: 'long', year: 'numeric' });
-
+        document.getElementById('cetak-tarikh').innerText = 'Tarikh: ' + new Date().toLocaleDateString('ms-MY', {day:'2-digit', month:'long', year:'numeric'});
         const tbody = document.getElementById('cetak-isi');
-        tbody.innerHTML = '';
-        let jumlahBesar = 0;
-        rekodTapis.forEach((item, i) => {
-            tbody.innerHTML += `<tr>
-                <td>${i+1}</td><td>${formatTarikh(item.tarikh)}</td><td>${item.produk}</td>
-                <td>${item.dihantar}</td><td>${item.tambahan}</td><td>${item.terjual}</td>
-                <td>${item.harga.toFixed(2)}</td><td>${item.jumlah.toFixed(2)}</td></tr>`;
+        tbody.innerHTML = ''; let jumlahBesar = 0;
+        tapis.forEach((item, i) => {
+            tbody.innerHTML += `<tr><td>${i+1}</td><td>${formatTarikh(item.tarikh)}</td><td>${item.produk}</td><td>${item.dihantar}</td><td>${item.tambahan}</td><td>${item.terjual}</td><td>${item.harga.toFixed(2)}</td><td>${item.jumlah.toFixed(2)}</td></tr>`;
             jumlahBesar += item.jumlah;
         });
-
         const jumlahPerHari = {};
-        rekodTapis.forEach(item => {
-            if (!jumlahPerHari[item.tarikh]) jumlahPerHari[item.tarikh] = 0;
-            jumlahPerHari[item.tarikh] += item.jumlah;
-        });
+        tapis.forEach(item => { if (!jumlahPerHari[item.tarikh]) jumlahPerHari[item.tarikh] = 0; jumlahPerHari[item.tarikh] += item.jumlah; });
         const tarikhUnik = Object.keys(jumlahPerHari).sort();
         let htmlRingkasan = '<strong>Ringkasan Jualan Mengikut Hari:</strong><br>';
         tarikhUnik.forEach(t => htmlRingkasan += `${formatTarikh(t)}: RM ${jumlahPerHari[t].toFixed(2)}<br>`);
@@ -734,48 +640,29 @@
         return true;
     }
 
-    function cetakResit() {
-        if (sediakanResit()) window.print();
-    }
+    function cetakResit() { if (sediakanResit()) window.print(); }
 
     async function kongsiResit() {
         if (!sediakanResit()) return;
-        if (confirm('Sebelum kongsi, ingin buat backup data dahulu?')) backupData();
-
-        const resitDiv = document.getElementById('resit-print');
-        resitDiv.style.display = 'block';
-        resitDiv.style.position = 'absolute';
-        resitDiv.style.left = '-9999px';
-        resitDiv.style.top = '0';
-        resitDiv.style.width = '800px';
-        resitDiv.style.background = 'white';
-
+        if (confirm('Backup dulu?')) backupData();
+        const div = document.getElementById('resit-print');
+        div.style.display = 'block'; div.style.position = 'absolute'; div.style.left = '-9999px'; div.style.top = '0'; div.style.width = '800px'; div.style.background = 'white';
         try {
-            const canvas = await html2canvas(resitDiv, { scale: 2, backgroundColor: '#ffffff', logging: false });
-            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+            const canvas = await html2canvas(div, { scale: 2, backgroundColor: '#ffffff', logging: false });
+            const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
             const file = new File([blob], 'resit_jualan.png', { type: 'image/png' });
-
             if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
                 await navigator.share({ files: [file], title: 'Resit Jualan', text: 'Resit jualan tempoh dipilih.' });
-                alert('Resit berjaya dikongsi!');
+                alert('Resit dikongsi!');
             } else {
                 const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url; a.download = 'resit_jualan.png';
+                const a = document.createElement('a'); a.href=url; a.download='resit_jualan.png';
                 document.body.appendChild(a); a.click(); document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                alert('Peranti tidak menyokong kongsi imej.\nImej resit dimuat turun sebagai resit_jualan.png');
+                alert('Imej dimuat turun.');
             }
-        } catch (err) {
-            console.error(err);
-            alert('Gagal menjana imej. Sila cuba lagi.');
-        } finally {
-            resitDiv.style.display = 'none';
-            resitDiv.style.position = '';
-            resitDiv.style.left = '';
-            resitDiv.style.top = '';
-            resitDiv.style.width = '';
-        }
+        } catch (e) { alert('Gagal kongsi.'); }
+        finally { div.style.display = 'none'; div.style.position = ''; div.style.left = ''; }
     }
 </script>
 </body>
