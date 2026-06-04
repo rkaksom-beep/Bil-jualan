@@ -638,29 +638,58 @@
         reader.readAsText(file);
     }
 
-    // ========== RESIT & CETAK ==========
+    // ========== RESIT & CETAK (DIKEMAS KINI DENGAN SUSUNAN TARIKH) ==========
     function sediakanResit() {
         const dari = document.getElementById('dari-tarikh').value;
         const hingga = document.getElementById('hingga-tarikh').value;
         if (!dari || !hingga) { alert('Pilih tarikh.'); return false; }
         const mula = new Date(dari + 'T00:00:00');
         const tamat = new Date(hingga + 'T23:59:59');
-        const tapis = rekodJualan.filter(item => { const t = new Date(item.tarikh + 'T00:00:00'); return t >= mula && t <= tamat; });
+        
+        // Tapis dan susun rekod mengikut tarikh (ascending)
+        const tapis = rekodJualan
+            .filter(item => {
+                const t = new Date(item.tarikh + 'T00:00:00');
+                return t >= mula && t <= tamat;
+            })
+            .sort((a, b) => new Date(a.tarikh) - new Date(b.tarikh));
+        
         if (tapis.length === 0) { alert('Tiada rekod.'); return false; }
+        
         document.getElementById('cetak-nama-syarikat').innerText = namaSyarikat;
         document.getElementById('cetak-tarikh').innerText = 'Tarikh: ' + new Date().toLocaleDateString('ms-MY', {day:'2-digit', month:'long', year:'numeric'});
+        
         const tbody = document.getElementById('cetak-isi');
-        tbody.innerHTML = ''; let jumlahBesar = 0;
+        tbody.innerHTML = ''; 
+        let jumlahBesar = 0;
+        
         tapis.forEach((item, i) => {
-            tbody.innerHTML += `<tr><td>${i+1}</td><td>${formatTarikh(item.tarikh)}</td><td>${item.produk}</td><td>${item.dihantar}</td><td>${item.tambahan}</td><td>${item.terjual}</td><td>${item.harga.toFixed(2)}</td><td>${item.jumlah.toFixed(2)}</td></tr>`;
+            tbody.innerHTML += `<tr>
+                <td>${i+1}</td>
+                <td>${formatTarikh(item.tarikh)}</td>
+                <td>${item.produk}</td>
+                <td>${item.dihantar}</td>
+                <td>${item.tambahan}</td>
+                <td>${item.terjual}</td>
+                <td>${item.harga.toFixed(2)}</td>
+                <td>${item.jumlah.toFixed(2)}</td>
+            </tr>`;
             jumlahBesar += item.jumlah;
         });
+        
+        // Kumpul jumlah per hari (sudah automatik ikut susunan kerana tapis dah disusun)
         const jumlahPerHari = {};
-        tapis.forEach(item => { if (!jumlahPerHari[item.tarikh]) jumlahPerHari[item.tarikh] = 0; jumlahPerHari[item.tarikh] += item.jumlah; });
+        tapis.forEach(item => { 
+            if (!jumlahPerHari[item.tarikh]) jumlahPerHari[item.tarikh] = 0; 
+            jumlahPerHari[item.tarikh] += item.jumlah; 
+        });
+        
+        // Dapatkan tarikh unik dan susun (walaupun Object.keys kadang-kadang ikut susunan insertion)
         const tarikhUnik = Object.keys(jumlahPerHari).sort();
         let htmlRingkasan = '<strong>Ringkasan Jualan Mengikut Hari:</strong><br>';
         tarikhUnik.forEach(t => htmlRingkasan += `${formatTarikh(t)}: RM ${jumlahPerHari[t].toFixed(2)}<br>`);
         htmlRingkasan += `<strong>Jumlah Keseluruhan: RM ${jumlahBesar.toFixed(2)}</strong>`;
+        
         document.getElementById('ringkasan-harian').innerHTML = htmlRingkasan;
         document.getElementById('cetak-jumlah-besar').innerText = jumlahBesar.toFixed(2);
         return true;
