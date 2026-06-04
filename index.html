@@ -37,6 +37,7 @@
         td { word-break: break-word; }
         .total-row { font-weight: bold; background: #e9ecef; }
         .edit-input { width: 70px !important; padding: 4px; font-size: 13px; }
+        .edit-input-produk { width: 100px !important; padding: 4px; font-size: 13px; }
 
         .btn-group { margin: 15px 0; }
         .filter-section { background: #e9ecef; padding: 10px; border-radius: 5px; margin: 15px 0; }
@@ -274,7 +275,6 @@
 
     window.onload = function() {
         migrasiData();
-
         const t = new Date();
         document.getElementById('tarikh-jualan').valueAsDate = t;
         const tgl = new Date(t); tgl.setDate(t.getDate()-2);
@@ -292,7 +292,7 @@
         document.getElementById('stok-awal-group').style.display = document.getElementById('setup-stok').checked ? 'flex' : 'none';
     }
 
-    // ========== SETUP PRODUK ==========
+    // ========== SETUP PRODUK (DENGAN EDIT) ==========
     function tambahProduk() {
         const nama = document.getElementById('setup-nama-produk').value.trim();
         const harga = parseFloat(document.getElementById('setup-harga').value);
@@ -321,14 +321,81 @@
         document.getElementById('stok-awal-group').style.display = 'none';
     }
 
+    function editProduk(index) {
+        const produk = senaraiProduk[index];
+        const tbody = document.getElementById('isi-jadual-produk');
+        const tr = tbody.children[index];
+        tr.innerHTML = `
+            <td><input type="text" class="edit-input-produk" id="edit-nama-${index}" value="${produk.nama}"></td>
+            <td><input type="number" class="edit-input-produk" id="edit-harga-${index}" value="${produk.harga}" step="0.01" min="0"></td>
+            <td>
+                <select id="edit-jenis-${index}">
+                    <option value="harian" ${produk.jenis === 'harian' ? 'selected' : ''}>Harian</option>
+                    <option value="stok" ${produk.jenis === 'stok' ? 'selected' : ''}>Stok</option>
+                </select>
+            </td>
+            <td>
+                <input type="number" class="edit-input-produk" id="edit-stok-${index}" value="${produk.stok || 0}" min="0" ${produk.jenis === 'harian' ? 'disabled' : ''}>
+            </td>
+            <td>
+                <button class="btn btn-success" onclick="simpanEditProduk(${index})">✔</button>
+                <button class="btn btn-secondary" onclick="paparJadualProduk()">✖</button>
+            </td>
+        `;
+        // Tambah event listener untuk toggle stok input bila jenis berubah
+        document.getElementById(`edit-jenis-${index}`).addEventListener('change', function() {
+            const stokInput = document.getElementById(`edit-stok-${index}`);
+            if (this.value === 'stok') {
+                stokInput.disabled = false;
+            } else {
+                stokInput.disabled = true;
+                stokInput.value = '0';
+            }
+        });
+    }
+
+    function simpanEditProduk(index) {
+        const nama = document.getElementById(`edit-nama-${index}`).value.trim();
+        const harga = parseFloat(document.getElementById(`edit-harga-${index}`).value);
+        const jenis = document.getElementById(`edit-jenis-${index}`).value;
+        const stok = parseInt(document.getElementById(`edit-stok-${index}`).value) || 0;
+
+        if (!nama || isNaN(harga) || harga <= 0) { alert('Isi nama dan harga yang sah.'); return; }
+        // Semak duplikasi nama (kecuali produk sendiri)
+        if (senaraiProduk.some((p, i) => i !== index && p.nama.toLowerCase() === nama.toLowerCase())) {
+            alert('Nama produk sudah wujud.');
+            return;
+        }
+        if (jenis === 'stok' && stok < 0) { alert('Stok tidak boleh negatif.'); return; }
+
+        const produk = senaraiProduk[index];
+        produk.nama = nama;
+        produk.harga = harga;
+        
+        // Jika berubah dari harian ke stok, tetapkan tarikhStokMula jika belum ada
+        if (jenis === 'stok' && produk.jenis === 'harian') {
+            produk.tarikhStokMula = new Date().toISOString().slice(0,10);
+        }
+        produk.jenis = jenis;
+        produk.stok = jenis === 'stok' ? stok : 0;
+
+        simpanData('produk', senaraiProduk);
+        paparJadualProduk();
+        isiDropdownProduk(); // Kemaskini dropdown di halaman rekod
+    }
+
     function paparJadualProduk() {
         const tbody = document.getElementById('isi-jadual-produk');
         if (senaraiProduk.length === 0) { tbody.innerHTML = '<tr><td colspan="5">Tiada produk.</td></tr>'; return; }
         tbody.innerHTML = senaraiProduk.map((p, idx) => `<tr>
             <td>${p.nama}</td><td>${p.harga.toFixed(2)}</td><td>${p.jenis === 'stok' ? 'Stok' : 'Harian'}</td>
             <td>${p.jenis === 'stok' ? p.stok : '-'}</td>
-            <td>${p.jenis === 'stok' ? `<button class="btn btn-warning" onclick="tambahStokProduk(${idx})">+ Stok</button> ` : ''}
-            <button class="btn btn-danger" onclick="padamProduk(${idx})">Padam</button></td></tr>`).join('');
+            <td>
+                <button class="btn btn-info" onclick="editProduk(${idx})">✎</button>
+                ${p.jenis === 'stok' ? `<button class="btn btn-warning" onclick="tambahStokProduk(${idx})">+ Stok</button> ` : ''}
+                <button class="btn btn-danger" onclick="padamProduk(${idx})">Padam</button>
+            </td>
+        </tr>`).join('');
     }
 
     function tambahStokProduk(index) {
@@ -450,7 +517,7 @@
         if (produk.jenis === 'harian') { document.getElementById('bil-dihantar').value = '0'; document.getElementById('bil-tambahan').value = '0'; }
     }
 
-    // ========== PAPAR REKOD (DENGAN INDEKS GLOBAL) ==========
+    // ========== PAPAR REKOD ==========
     function paparSemuaRekod() {
         let htmlHarian = '';
         let htmlStok = '';
@@ -459,40 +526,22 @@
 
         rekodJualan.forEach((item, idxGlobal) => {
             const produk = senaraiProduk.find(p => p.nama.trim().toLowerCase() === item.produk.trim().toLowerCase());
-            if (!produk) {
-                console.warn('Produk tidak dijumpai untuk rekod:', item);
-                return;
-            }
+            if (!produk) return;
             if (produk.jenis === 'harian') {
                 countHarian++;
                 htmlHarian += `<tr>
-                    <td>${countHarian}</td>
-                    <td>${formatTarikh(item.tarikh)}</td>
-                    <td>${item.produk}</td>
-                    <td>${item.dihantar}</td>
-                    <td>${item.tambahan}</td>
-                    <td>${item.terjual}</td>
-                    <td>${item.harga.toFixed(2)}</td>
-                    <td>${item.jumlah.toFixed(2)}</td>
-                    <td>
-                        <button class="btn btn-info" onclick="editRekod(${idxGlobal})">✎</button>
-                        <button class="btn btn-danger" onclick="padamRekod(${idxGlobal})">✖</button>
-                    </td>
-                </tr>`;
+                    <td>${countHarian}</td><td>${formatTarikh(item.tarikh)}</td><td>${item.produk}</td>
+                    <td>${item.dihantar}</td><td>${item.tambahan}</td><td>${item.terjual}</td>
+                    <td>${item.harga.toFixed(2)}</td><td>${item.jumlah.toFixed(2)}</td>
+                    <td><button class="btn btn-info" onclick="editRekod(${idxGlobal})">✎</button>
+                    <button class="btn btn-danger" onclick="padamRekod(${idxGlobal})">✖</button></td></tr>`;
             } else if (produk.jenis === 'stok') {
                 countStok++;
                 htmlStok += `<tr>
-                    <td>${countStok}</td>
-                    <td>${formatTarikh(item.tarikh)}</td>
-                    <td>${item.produk}</td>
-                    <td>${item.terjual}</td>
-                    <td>${item.harga.toFixed(2)}</td>
-                    <td>${item.jumlah.toFixed(2)}</td>
-                    <td>
-                        <button class="btn btn-info" onclick="editRekod(${idxGlobal})">✎</button>
-                        <button class="btn btn-danger" onclick="padamRekod(${idxGlobal})">✖</button>
-                    </td>
-                </tr>`;
+                    <td>${countStok}</td><td>${formatTarikh(item.tarikh)}</td><td>${item.produk}</td>
+                    <td>${item.terjual}</td><td>${item.harga.toFixed(2)}</td><td>${item.jumlah.toFixed(2)}</td>
+                    <td><button class="btn btn-info" onclick="editRekod(${idxGlobal})">✎</button>
+                    <button class="btn btn-danger" onclick="padamRekod(${idxGlobal})">✖</button></td></tr>`;
             }
         });
 
@@ -500,7 +549,7 @@
         document.getElementById('isi-senarai-stok').innerHTML = countStok ? htmlStok : '<tr><td colspan="7">Tiada rekod.</td></tr>';
     }
 
-    // ========== EDIT & PADAM ==========
+    // ========== EDIT & PADAM REKOD ==========
     function editRekod(index) {
         const rekod = rekodJualan[index];
         const produk = senaraiProduk.find(p => p.nama.trim().toLowerCase() === rekod.produk.trim().toLowerCase());
@@ -638,66 +687,37 @@
         reader.readAsText(file);
     }
 
-    // ========== RESIT & CETAK (DIKEMAS KINI DENGAN SUSUNAN TARIKH) ==========
+    // ========== RESIT & CETAK ==========
     function sediakanResit() {
         const dari = document.getElementById('dari-tarikh').value;
         const hingga = document.getElementById('hingga-tarikh').value;
         if (!dari || !hingga) { alert('Pilih tarikh.'); return false; }
         const mula = new Date(dari + 'T00:00:00');
         const tamat = new Date(hingga + 'T23:59:59');
-        
-        // Tapis dan susun rekod mengikut tarikh (ascending)
         const tapis = rekodJualan
-            .filter(item => {
-                const t = new Date(item.tarikh + 'T00:00:00');
-                return t >= mula && t <= tamat;
-            })
+            .filter(item => { const t = new Date(item.tarikh + 'T00:00:00'); return t >= mula && t <= tamat; })
             .sort((a, b) => new Date(a.tarikh) - new Date(b.tarikh));
-        
         if (tapis.length === 0) { alert('Tiada rekod.'); return false; }
-        
         document.getElementById('cetak-nama-syarikat').innerText = namaSyarikat;
         document.getElementById('cetak-tarikh').innerText = 'Tarikh: ' + new Date().toLocaleDateString('ms-MY', {day:'2-digit', month:'long', year:'numeric'});
-        
         const tbody = document.getElementById('cetak-isi');
-        tbody.innerHTML = ''; 
-        let jumlahBesar = 0;
-        
+        tbody.innerHTML = ''; let jumlahBesar = 0;
         tapis.forEach((item, i) => {
-            tbody.innerHTML += `<tr>
-                <td>${i+1}</td>
-                <td>${formatTarikh(item.tarikh)}</td>
-                <td>${item.produk}</td>
-                <td>${item.dihantar}</td>
-                <td>${item.tambahan}</td>
-                <td>${item.terjual}</td>
-                <td>${item.harga.toFixed(2)}</td>
-                <td>${item.jumlah.toFixed(2)}</td>
-            </tr>`;
+            tbody.innerHTML += `<tr><td>${i+1}</td><td>${formatTarikh(item.tarikh)}</td><td>${item.produk}</td><td>${item.dihantar}</td><td>${item.tambahan}</td><td>${item.terjual}</td><td>${item.harga.toFixed(2)}</td><td>${item.jumlah.toFixed(2)}</td></tr>`;
             jumlahBesar += item.jumlah;
         });
-        
-        // Kumpul jumlah per hari (sudah automatik ikut susunan kerana tapis dah disusun)
         const jumlahPerHari = {};
-        tapis.forEach(item => { 
-            if (!jumlahPerHari[item.tarikh]) jumlahPerHari[item.tarikh] = 0; 
-            jumlahPerHari[item.tarikh] += item.jumlah; 
-        });
-        
-        // Dapatkan tarikh unik dan susun (walaupun Object.keys kadang-kadang ikut susunan insertion)
+        tapis.forEach(item => { if (!jumlahPerHari[item.tarikh]) jumlahPerHari[item.tarikh] = 0; jumlahPerHari[item.tarikh] += item.jumlah; });
         const tarikhUnik = Object.keys(jumlahPerHari).sort();
         let htmlRingkasan = '<strong>Ringkasan Jualan Mengikut Hari:</strong><br>';
         tarikhUnik.forEach(t => htmlRingkasan += `${formatTarikh(t)}: RM ${jumlahPerHari[t].toFixed(2)}<br>`);
         htmlRingkasan += `<strong>Jumlah Keseluruhan: RM ${jumlahBesar.toFixed(2)}</strong>`;
-        
         document.getElementById('ringkasan-harian').innerHTML = htmlRingkasan;
         document.getElementById('cetak-jumlah-besar').innerText = jumlahBesar.toFixed(2);
         return true;
     }
 
-    function cetakResit() { 
-        if (sediakanResit()) window.print(); 
-    }
+    function cetakResit() { if (sediakanResit()) window.print(); }
 
     async function kongsiResit() {
         if (!sediakanResit()) return;
